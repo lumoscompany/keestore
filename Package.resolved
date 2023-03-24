@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/attaswift/BigInt.git",
+      "state" : {
+        "revision" : "0ed110f7555c34ff468e72e1686e59721f2b0da6",
+        "version" : "5.3.0"
+      }
+    },
+    {
+      "identity" : "libkeccak.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lumoscompany/libkeccak.swift",
+      "state" : {
+        "revision" : "f850d610588d647504840e7d1839e9e80148dfb7",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "libsecp256k1.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lumoscompany/libsecp256k1.swift",
+      "state" : {
+        "revision" : "02a9012012fdfc2aab3895a1f0d170ef258026e8",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "1787B90C-0E1D-451E-8CB6-C6D4B3D56ABE",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BIPTests",
+        "name" : "BIPTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "WolstoreTests",
+        "name" : "WolstoreTests"
+      }
+    }
+  ],
+  "version" : 1
+}
