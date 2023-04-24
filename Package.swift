@@ -4,13 +4,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "Wolstore",
+    name: "Keestore",
     platforms: [
         .iOS(.v13),
         .macOS(.v10_15),
     ],
     products: [
-        .library(name: "Wolstore", targets: ["Wolstore"]),
+        .library(name: "Keestore", targets: ["Keestore"]),
     ],
     dependencies: [
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
@@ -19,9 +19,9 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Wolstore",
+            name: "Keestore",
             dependencies: ["BIP"],
-            path: "Sources/Wolstore",
+            path: "Sources/Keestore",
             swiftSettings: [.define("DEBUG", .when(configuration: .debug))]
         ),
         .target(
@@ -35,7 +35,7 @@ let package = Package(
             dependencies: [
                 .product(name: "libsecp256k1", package: "libsecp256k1.swift"),
                 .product(name: "libkeccak", package: "libkeccak.swift"),
-                "BigInt"
+                "BigInt",
             ],
             path: "Sources/ObscureKit",
             swiftSettings: [.define("DEBUG", .when(configuration: .debug))]
@@ -45,8 +45,8 @@ let package = Package(
             dependencies: ["BIP", "ObscureKit"]
         ),
         .testTarget(
-            name: "WolstoreTests",
-            dependencies: ["Wolstore"]
+            name: "KeestoreTests",
+            dependencies: ["Keestore"]
         ),
     ]
 )

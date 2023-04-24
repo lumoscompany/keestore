@@ -1,0 +1,105 @@
+//
+//  Created by Anton Spivak
+//
+
+import BIP
+import Foundation
+
+// MARK: - ChainInformation
+
+public struct ChainInformation {
+    // MARK: Lifecycle
+
+    init(
+        name: String,
+        icon: InsertedAsset?,
+        signingProtocol: SigningProtocol,
+        addressFormatting: AddressFormatting?,
+        b32: B32?,
+        b39: B39?,
+        b44: B44?
+    ) {
+        self.name = name
+        self.icon = icon
+
+        self.signingProtocol = signingProtocol
+        self.addressFormatting = addressFormatting
+
+        self.b32 = b32
+        self.b39 = b39
+        self.b44 = b44
+    }
+
+    // MARK: Public
+
+    public let name: String
+    public let icon: InsertedAsset?
+
+    public let signingProtocol: SigningProtocol
+    public let addressFormatting: AddressFormatting?
+
+    public let b32: B32?
+    public let b39: B39?
+    public let b44: B44?
+}
+
+// MARK: Codable
+
+extension ChainInformation: Codable {}
+
+// MARK: Sendable
+
+extension ChainInformation: Sendable {}
+
+// MARK: Hashable
+
+extension ChainInformation: Hashable {}
+
+public extension BIP39.Digest {
+    init(for chainInformation: ChainInformation) {
+        let b39 = chainInformation.b39.value
+        self.init(length: b39.words, algorithm: b39.algorithm)
+    }
+
+    init(for chainInformation: ChainInformation, with mnemonica: Mnemonica) throws {
+        try self.init(mnemonica, algorithm: chainInformation.b39.value.algorithm)
+    }
+}
+
+public extension ChainInformation {
+    static func ton() -> ChainInformation {
+        self.init(
+            name: "TON",
+            icon: nil,
+            signingProtocol: .init(algorithm: .curve25519),
+            addressFormatting: nil,
+            b32: .init(),
+            b39: .init(words: .w24, algorithm: .ton()),
+            b44: nil
+        )
+    }
+
+    static func ethereum() -> ChainInformation {
+        self.init(
+            name: "Ethereum",
+            icon: nil,
+            signingProtocol: .init(algorithm: .secp256k1),
+            addressFormatting: .ethereum,
+            b32: .init(),
+            b39: .init(words: .w12, algorithm: .ethereum()),
+            b44: .init(coin: .ethereum)
+        )
+    }
+
+    static func tron() -> ChainInformation {
+        self.init(
+            name: "TRON",
+            icon: nil,
+            signingProtocol: .init(algorithm: .secp256k1),
+            addressFormatting: .tron,
+            b32: .init(),
+            b39: .init(words: .w12, algorithm: .ethereum()),
+            b44: .init(coin: .tron)
+        )
+    }
+}

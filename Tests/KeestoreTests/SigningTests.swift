@@ -5,7 +5,7 @@
 import Foundation
 import XCTest
 
-@testable import Wolstore
+@testable import Keestore
 
 // MARK: - SigningTests
 
@@ -16,13 +16,14 @@ final class SigningTests: XCTestCase {
         try vectors0.forEach({
             let account = try Account.Blockchain.create(
                 for: .ton(),
+                addressProvider: .empty,
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     nil
                 ),
                 using: key
             )
-            
+
             guard let signer = try account.signer(using: key)
             else {
                 XCTAssert(false)
@@ -52,7 +53,7 @@ final class SigningTests: XCTestCase {
                 ),
                 using: key
             )
-            
+
             guard let signer = try account.signer(using: key)
             else {
                 XCTAssert(false)

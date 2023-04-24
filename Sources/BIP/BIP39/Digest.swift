@@ -2,8 +2,10 @@
 //  Created by Anton Spivak
 //
 
-import Foundation
 import CryptoKit
+import Foundation
+
+// MARK: - BIP39.Digest
 
 public extension BIP39 {
     struct Digest {
@@ -25,25 +27,22 @@ public extension BIP39.Digest {
     init(
         glossary: BIP39.Mnemonica.Glossary = .english,
         length: BIP39.Mnemonica.Length,
-        configuration: BIP39.Configuration
+        algorithm: [BIP39.DerivationAlgorithm]
     ) {
         let entropy = BIP39.Digest._entropy(with: length)
         guard let mnemonica = try? BIP39.Mnemonica(entropy, glossary: glossary),
-              let digest = try? BIP39.Digest(mnemonica, configuration: configuration)
+              let digest = try? BIP39.Digest(mnemonica, algorithm: algorithm)
         else {
             fatalError("[BIP39]: Random mnemonica generation failed.")
         }
-        
+
         self = digest
     }
-    
-    init(
-        _ mnemonica: BIP39.Mnemonica,
-        configuration: BIP39.Configuration
-    ) throws {
+
+    init(_ mnemonica: BIP39.Mnemonica, algorithm: [BIP39.DerivationAlgorithm]) throws {
         try self.init(
             mnemonica: mnemonica,
-            seed: configuration.seed(from: mnemonica.words)
+            seed: algorithm.seed(from: mnemonica.words)
         )
     }
 }
@@ -67,4 +66,10 @@ extension BIP39.Digest: Equatable {
 
 // MARK: - BIP39.Digest + Sendable
 
+// extension BIP39.Digest: Codable {}
+
 extension BIP39.Digest: Sendable {}
+
+// MARK: - BIP39.Digest + Hashable
+
+extension BIP39.Digest: Hashable {}

@@ -1,10 +1,10 @@
-# Wolstore [![Tests](https://github.com/lumoscompany/wolstore/actions/workflows/default.yml/badge.svg)](https://github.com/lumoscompany/wolstore/actions/workflows/default.yml)
+# Wolstore [![Tests](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml/badge.svg)](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml)
 
 Pure Swift account manager for some blockchain networks
 
 - BIP32, BIP39, BIP44
 
-## Supported networks
+## Maybe supported networks
 
 - Ethereum
 - TON
@@ -14,67 +14,66 @@ Pure Swift account manager for some blockchain networks
 
 ```swift
 .package(
-    url: "https://github.com/lumoscompany/wolstore.git",
-    .upToNextMajor(from: "0.1.0")
+    url: "https://github.com/lumoscompany/keestore.git",
+    .upToNextMajor(from: "0.9.0")
 )
 ```
 
 ## Usage samples
 
-### Importing accounts
+### Importing blockhain accounts
 
 ```swift
-let key = AES.KEY32(string: "123456")
-let mnemonica = "12/24/32 words"
+import Keestore
 
-let account = try Account.import(
-    using: key,
-    network: .ethereum(.mainnet),
-    options: .mnemonica(
-        $0.mnemonica.components(separatedBy: " "),
+let key = DerivedKey(string: "123456")
+let passphrase = "12/24/32 words"
+
+let account = try Account.Blockchain.create(
+    for: .ethereum(),
+    with: .mnemonica(
+        passphrase.components(separatedBy: " "),
         HDWallet(coin: .ethereum).derivationPath
-    )
+    ),
+    using: key
 )
 
-let keyPair = try account.keyPair(using: key)
-let address = try Address.Ethereum(keyPair)
-
-print(address)
+print(account.address)
 ```
 
-### Getting accounts using .wolstore file
+### Getting accounts using .keestore file
 
 ```swift
-let readerWriter = try Wolstore.ReaderWriter(
-    direcotryURL: directoryURL,
-    fileNamed: fileName
-)
+let fileName = "default"
+let directoryURL = URL(fileURLWithPath: "file:///")
+let file = File(direcotryURL: directoryURL, fileNamed: fileName)
 
-guard !readerWriter.isFileExists
+guard file.isExists
 else {
     return
 }
 
-print(accounts)
+let keestore = try await file.read()
+let account = keestore.accounts[0]
 
-let account = accounts[0]
-let key = AES.KEY32(string: "${key}")
+switch account.kind {
+case let .blockchain(value):
+    let key = DerivedKey(string: "${key}")
+    let credentials = try? account.credentials?.decrypt(using: key)
+    print(credentials)
+default:
+    break
+}
 
-let keyPair = try account.keyPair(using: key)
-let address = try Address.Ethereum(keyPair)
-
-print(address)
 ```
 
 ### Signing
 
 ```swift
 let account: Account
-let data: Data
-let key: AES.KEY32
+let key: DerivedKey
 
-let signature = try account.sign(data, using: key)
-
+let signature = try? account.signer?.sign(data, using: key)
 print(signature)
 ```
 

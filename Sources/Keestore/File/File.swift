@@ -20,10 +20,10 @@ public struct File {
     public let fileName: String
 
     public var fileURL: URL {
-        let fileURL = direcotryURL.appendingPathComponent("\(fileName).wolstore")
+        let fileURL = direcotryURL.appendingPathComponent("\(fileName).keestore")
         guard fileURL.isFileURL
         else {
-            fatalError("[Wolstore]: Not file URL.")
+            fatalError("[Keestore]: Not file URL.")
         }
         return fileURL
     }
@@ -36,7 +36,7 @@ public struct File {
 // MARK: - File + Operations
 
 public extension File {
-    func read() async throws -> Wolstore? {
+    func read() async throws -> Keestore? {
         guard isExists
         else {
             return nil
@@ -55,29 +55,29 @@ public extension File {
 
                 let version: Version
                 do {
-                    version = try JSONDecoder.wolstore.decode(Version.self, from: encodedData)
+                    version = try JSONDecoder.keestore.decode(Version.self, from: encodedData)
                 } catch {
-                    continueation.resume(throwing: Wolstore.Error.decodingFailed(error))
+                    continueation.resume(throwing: Keestore.Error.decodingFailed(error))
                     return
                 }
 
-                let wolstore = Wolstore(version)
-                continueation.resume(returning: wolstore)
+                let keestore = Keestore(version)
+                continueation.resume(returning: keestore)
             })
         })
     }
 
-    func write(_ wolstore: Wolstore) async throws {
+    func write(_ keestore: Keestore) async throws {
         let fileURL = fileURL
-        let version = wolstore.version
+        let version = keestore.version
 
         return try await withCheckedThrowingContinuation({ continueation in
             DispatchQueue.global(qos: .background).async(execute: {
                 let encodedData: Data
                 do {
-                    encodedData = try JSONEncoder.wolstore.encode(version)
+                    encodedData = try JSONEncoder.keestore.encode(version)
                 } catch {
-                    continueation.resume(throwing: Wolstore.Error.encodingFailed(error))
+                    continueation.resume(throwing: Keestore.Error.encodingFailed(error))
                     return
                 }
 

@@ -13,14 +13,14 @@ public struct EncryptedValue<T> where T: Codable {
     public init(decryptedValue: T, using key: DerivedKey) throws {
         let encodedValue: Data
         do {
-            encodedValue = try JSONEncoder.wolstore.encode(decryptedValue)
+            encodedValue = try JSONEncoder.keestore.encode(decryptedValue)
         } catch {
-            throw Wolstore.Error.encodingFailed(error)
+            throw Keestore.Error.encodingFailed(error)
         }
 
         guard let encryptedValue = AES(key).encrypt(encodedValue)
         else {
-            throw Wolstore.Error.encryptionFailed
+            throw Keestore.Error.encryptionFailed
         }
 
         self.encryptedValue = encryptedValue
@@ -37,14 +37,14 @@ public struct EncryptedValue<T> where T: Codable {
     public func decrypt(using key: DerivedKey) throws -> T {
         guard let decryptedValue = AES(key).decrypt(encryptedValue)
         else {
-            throw Wolstore.Error.decryptionFailed
+            throw Keestore.Error.decryptionFailed
         }
 
         let decodedValue: T
         do {
-            decodedValue = try JSONDecoder.wolstore.decode(T.self, from: decryptedValue)
+            decodedValue = try JSONDecoder.keestore.decode(T.self, from: decryptedValue)
         } catch {
-            throw Wolstore.Error.decodingFailed(error)
+            throw Keestore.Error.decodingFailed(error)
         }
 
         return decodedValue

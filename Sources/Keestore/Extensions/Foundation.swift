@@ -5,7 +5,7 @@
 import Foundation
 
 internal extension JSONEncoder {
-    static var wolstore: JSONEncoder = {
+    static var keestore: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .secondsSince1970
         encoder.keyEncodingStrategy = .useDefaultKeys
@@ -15,7 +15,7 @@ internal extension JSONEncoder {
 }
 
 internal extension JSONDecoder {
-    static var wolstore: JSONDecoder = {
+    static var keestore: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
         decoder.keyDecodingStrategy = .useDefaultKeys

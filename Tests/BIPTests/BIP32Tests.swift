@@ -19,7 +19,7 @@ final class BIP32Tests: XCTestCase {
             }
 
             let mnemonica = try BIP39.Mnemonica($0.mnemonica)
-            let digest = try BIP39.Digest(mnemonica, configuration: .standart())
+            let digest = try BIP39.Digest(mnemonica, algorithm: .ethereum())
             let keyPair = BIP32.ExtendedKey(digest, derivationPath).keyPair
 
             XCTAssertEqual(keyPair.publicKey.rawValue.hexRepresentation, $0.publicKey)

@@ -16,9 +16,11 @@ public extension BIP39.Mnemonica {
 
 extension BIP39.Mnemonica.Glossary: CaseIterable {}
 
-// MARK: - BIP39.Mnemonica.Glossary + Equatable
+// MARK: - BIP39.Mnemonica.Glossary + Hashable
 
-extension BIP39.Mnemonica.Glossary: Equatable {}
+// extension BIP39.Mnemonica.Glossary: Codable {}
+
+extension BIP39.Mnemonica.Glossary: Hashable {}
 
 // MARK: - BIP39.Mnemonica.Glossary + Sendable
 

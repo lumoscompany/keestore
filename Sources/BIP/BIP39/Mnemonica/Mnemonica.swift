@@ -62,16 +62,16 @@ public extension BIP39.Mnemonica {
 }
 
 public extension BIP39.Mnemonica {
-    func digest(
-        with configuration: BIP39.Configuration
-    ) throws -> BIP39.Digest {
-        try BIP39.Digest(self, configuration: configuration)
+    func digest(with algorithm: [BIP39.DerivationAlgorithm]) throws -> BIP39.Digest {
+        try BIP39.Digest(self, algorithm: algorithm)
     }
 }
 
-// MARK: - BIP39.Mnemonica + Equatable
+// MARK: - BIP39.Mnemonica + Hashable
 
-extension BIP39.Mnemonica: Equatable {}
+// extension BIP39.Mnemonica: Codable {}
+
+extension BIP39.Mnemonica: Hashable {}
 
 // MARK: - BIP39.Mnemonica + Sendable
 

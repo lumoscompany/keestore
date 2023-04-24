@@ -81,9 +81,9 @@ extension BIP32.DerivationPath.KeyIndex: ExpressibleByStringLiteral {
     }
 }
 
-// MARK: - BIP32.DerivationPath.KeyIndex + Equatable
+// MARK: - BIP32.DerivationPath.KeyIndex + Hashable
 
-extension BIP32.DerivationPath.KeyIndex: Equatable {}
+extension BIP32.DerivationPath.KeyIndex: Hashable {}
 
 // MARK: - BIP32.DerivationPath.KeyIndex + Sendable
 

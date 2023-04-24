@@ -5,7 +5,7 @@
 import Foundation
 import XCTest
 
-@testable import Wolstore
+@testable import Keestore
 
 // MARK: - AddressTests
 
@@ -23,8 +23,7 @@ final class AddressTests: XCTestCase {
                 using: key
             )
 
-            let address = Address.Ethereum(publicKey: account.pkey)
-            XCTAssertEqual(address.description.lowercased(), $0.address.lowercased())
+            XCTAssertEqual(account.address.lowercased(), $0.address.lowercased())
         })
 
         vectors1.forEach({
@@ -51,8 +50,7 @@ final class AddressTests: XCTestCase {
                 using: key
             )
 
-            let address = Address.TRON(publicKey: account.pkey)
-            XCTAssertEqual(address.description.lowercased(), $0.address.lowercased())
+            XCTAssertEqual(account.address.lowercased(), $0.address.lowercased())
         })
     }
 }

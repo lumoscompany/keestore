@@ -28,7 +28,7 @@ extension File.Version: Codable {
         case 1:
             self = try .v1(container.decode(V1.self, forKey: .data))
         default:
-            throw Wolstore.Error.unknownWolstoreVersion(version)
+            throw Keestore.Error.unknownFileVersion(version)
         }
     }
 
@@ -42,7 +42,7 @@ extension File.Version: Codable {
     }
 }
 
-internal extension Wolstore {
+internal extension Keestore {
     init(_ version: File.Version) {
         switch version {
         case let .v1(v1):

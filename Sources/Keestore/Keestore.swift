@@ -7,9 +7,9 @@ import Foundation
 @_exported import BIP
 @_exported import ObscureKit
 
-// MARK: - Wolstore
+// MARK: - Keestore
 
-public struct Wolstore {
+public struct Keestore {
     // MARK: Lifecycle
 
     public init(signature: DerivedKey.Signature, accounts: [Account]) {
@@ -19,13 +19,13 @@ public struct Wolstore {
 
     // MARK: Public
 
-    public var signature: DerivedKey.Signature
-    public var accounts: [Account]
+    private(set) public var signature: DerivedKey.Signature
+    private(set) public var accounts: [Account]
 }
 
-// MARK: - Wolstore + Modifications
+// MARK: - Keestore + Modifications
 
-public extension Wolstore {
+public extension Keestore {
     mutating func append(_ account: Account, using key: DerivedKey) throws {
         guard key.validate(signature)
         else {

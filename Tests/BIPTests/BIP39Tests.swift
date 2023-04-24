@@ -13,17 +13,17 @@ import XCTest
 final class BIP39Tests: XCTestCase {
     func testStandart() throws {
         try vectors0.forEach({
-            let digest = try Mnemonica($0.mnemonica).digest(with: .standart(
+            let digest = try Mnemonica($0.mnemonica).digest(with: .ethereum(
                 password: $0.password,
                 iterations: $0.iterations,
-                keyLength: $0.keyLength
+                klength: $0.keyLength
             ))
 
             XCTAssertEqual(digest.seed.hexRepresentation, $0.seed)
         })
 
         try vectors1.forEach({
-            let digest = try Mnemonica($0.mnemonica).digest(with: .standart(password: "TREZOR"))
+            let digest = try Mnemonica($0.mnemonica).digest(with: .ethereum(password: "TREZOR"))
             XCTAssertEqual(digest.seed.hexRepresentation, $0.seed)
         })
     }
@@ -37,7 +37,7 @@ final class BIP39Tests: XCTestCase {
 
     func testCreateImportTON() throws {
         try stride(from: 0, to: 10, by: 1).forEach({ _ in
-            let lhs = BIP39.Digest(glossary: .english, length: .w24, configuration: .ton())
+            let lhs = BIP39.Digest(glossary: .english, length: .w24, algorithm: .ton())
             let rhs = try Mnemonica(lhs.mnemonica.words).digest(with: .ton())
             XCTAssertEqual(lhs, rhs)
         })
@@ -45,8 +45,8 @@ final class BIP39Tests: XCTestCase {
 
     func testCreateImportStandart() throws {
         try stride(from: 0, to: 10, by: 1).forEach({ _ in
-            let lhs = BIP39.Digest(glossary: .english, length: .w12, configuration: .standart())
-            let rhs = try Mnemonica(lhs.mnemonica.words).digest(with: .standart())
+            let lhs = BIP39.Digest(glossary: .english, length: .w12, algorithm: .ethereum())
+            let rhs = try Mnemonica(lhs.mnemonica.words).digest(with: .ethereum())
 
             XCTAssertEqual(lhs, rhs)
         })

@@ -40,9 +40,9 @@ public extension BIP44.CoinKind {
     static let matic = BIP44.CoinKind(BIP32.DerivationPath.KeyIndex(rawValue: 0x800003c6))
 }
 
-// MARK: - BIP44.CoinKind + Equatable
+// MARK: - BIP44.CoinKind + Hashable
 
-extension BIP44.CoinKind: Equatable {}
+extension BIP44.CoinKind: Hashable {}
 
 // MARK: - BIP44.CoinKind + Sendable
 

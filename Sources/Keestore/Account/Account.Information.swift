@@ -39,7 +39,7 @@ public extension Account.Information {
         _ value: T,
         for informationType: InformationType
     ) throws where T: Encodable {
-        data[informationType] = try JSONEncoder.wolstore.encode(value)
+        data[informationType] = try JSONEncoder.keestore.encode(value)
     }
 
     func decode<T>(
@@ -51,6 +51,6 @@ public extension Account.Information {
             return nil
         }
 
-        return try JSONDecoder.wolstore.decode(type, from: data)
+        return try JSONDecoder.keestore.decode(type, from: data)
     }
 }
