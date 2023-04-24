@@ -15,7 +15,7 @@ final class SigningTests: XCTestCase {
 
         try vectors0.forEach({
             let account = try Account.Blockchain.create(
-                for: .ton,
+                for: .ton(),
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     nil
@@ -45,7 +45,7 @@ final class SigningTests: XCTestCase {
 
         try vectors1.forEach({
             let account = try Account.Blockchain.create(
-                for: .ethereum(.mainnnet),
+                for: .ethereum(),
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .ethereum).derivationPath

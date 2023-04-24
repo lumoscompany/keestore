@@ -22,7 +22,10 @@ public extension Address {
         }
 
         public init(publicKey: Data) {
-            let hash = keccak256(publicKey.dropFirst()).concreteBytes.suffix(20)
+            let publicKey = KeyPair.Secp256k1.PublicKey(rawValue: publicKey)
+            let uncompressed = publicKey.uncompressed.rawValue
+
+            let hash = keccak256(uncompressed.dropFirst()).concreteBytes.suffix(20)
             self.init(Data([TRON.prefix] + hash))
         }
 

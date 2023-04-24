@@ -15,7 +15,7 @@ final class AddressTests: XCTestCase {
 
         try vectors0.forEach({
             let account = try Account.Blockchain.create(
-                for: .ethereum(.mainnnet),
+                for: .ethereum(),
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .ethereum).derivationPath
@@ -23,8 +23,8 @@ final class AddressTests: XCTestCase {
                 using: key
             )
 
-            let address = Address.Ethereum(rawValue: account.address)
-            XCTAssertEqual(address?.description.lowercased(), $0.address.lowercased())
+            let address = Address.Ethereum(publicKey: account.pkey)
+            XCTAssertEqual(address.description.lowercased(), $0.address.lowercased())
         })
 
         vectors1.forEach({
@@ -43,7 +43,7 @@ final class AddressTests: XCTestCase {
 
         try vectors3.forEach({
             let account = try Account.Blockchain.create(
-                for: .tron,
+                for: .tron(),
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .tron).derivationPath
@@ -51,8 +51,8 @@ final class AddressTests: XCTestCase {
                 using: key
             )
 
-            let address = Address.TRON(rawValue: account.address)
-            XCTAssertEqual(address?.description.lowercased(), $0.address.lowercased())
+            let address = Address.TRON(publicKey: account.pkey)
+            XCTAssertEqual(address.description.lowercased(), $0.address.lowercased())
         })
     }
 }

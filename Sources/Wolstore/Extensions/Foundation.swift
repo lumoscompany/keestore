@@ -8,7 +8,7 @@ internal extension JSONEncoder {
     static var wolstore: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .secondsSince1970
-        encoder.keyEncodingStrategy = .convertToSnakeCase
+        encoder.keyEncodingStrategy = .useDefaultKeys
         encoder.dataEncodingStrategy = .base64
         return encoder
     }()
@@ -18,7 +18,7 @@ internal extension JSONDecoder {
     static var wolstore: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.keyDecodingStrategy = .useDefaultKeys
         decoder.dataDecodingStrategy = .base64
         return decoder
     }()

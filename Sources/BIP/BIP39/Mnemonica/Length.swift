@@ -57,9 +57,13 @@ internal extension BIP39.Mnemonica.Length {
     }
 }
 
-// MARK: - BIP39.Mnemonica.Length + Equatable
+// MARK: - BIP39.Mnemonica.Length + Codable
 
-extension BIP39.Mnemonica.Length: Equatable {}
+extension BIP39.Mnemonica.Length: Codable {}
+
+// MARK: - BIP39.Mnemonica.Length + Hashable
+
+extension BIP39.Mnemonica.Length: Hashable {}
 
 // MARK: - BIP39.Mnemonica.Length + Sendable
 
