@@ -10,15 +10,15 @@ public extension Account {
     struct Information {
         // MARK: Lifecycle
 
-        public init() {
-            self.data = [:]
+        public init(name: String, look: Look) {
+            self.name = name
+            self.look = look
         }
 
         // MARK: Public
 
-        public typealias InformationType = Int32
-
-        public var data: [InformationType: Data]
+        public let name: String
+        public let look: Look
     }
 }
 
@@ -34,23 +34,67 @@ extension Account.Information: Sendable {}
 
 extension Account.Information: Hashable {}
 
+// MARK: - Account.Information.Look
+
 public extension Account.Information {
-    mutating func encode<T>(
-        _ value: T,
-        for informationType: InformationType
-    ) throws where T: Encodable {
-        data[informationType] = try JSONEncoder.keestore.encode(value)
-    }
-
-    func decode<T>(
-        _ type: T.Type,
-        for informationType: InformationType
-    ) throws -> T? where T: Decodable {
-        guard let data = data[informationType]
-        else {
-            return nil
-        }
-
-        return try JSONDecoder.keestore.decode(type, from: data)
+    enum Look {
+        case card(Card)
     }
 }
+
+// MARK: - Account.Information.Look + Codable
+
+extension Account.Information.Look: Codable {}
+
+// MARK: - Account.Information.Look + Sendable
+
+extension Account.Information.Look: Sendable {}
+
+// MARK: - Account.Information.Look + Hashable
+
+extension Account.Information.Look: Hashable {}
+
+// MARK: - Account.Information.Look.Card
+
+public extension Account.Information.Look {
+    struct Card {
+        // MARK: Lifecycle
+
+        public init(
+            borderColor: Unicolor,
+            backgroundAsset: CodableAsset,
+            primaryForegroundColor: Unicolor,
+            secondaryForegroundColor: Unicolor
+        ) {
+            self.borderColor = borderColor
+            self.backgroundAsset = backgroundAsset
+            self.primaryForegroundColor = primaryForegroundColor
+            self.secondaryForegroundColor = secondaryForegroundColor
+        }
+
+        // MARK: Public
+
+        @CodableColor
+        public var borderColor: Unicolor
+
+        public let backgroundAsset: CodableAsset
+
+        @CodableColor
+        public var primaryForegroundColor: Unicolor
+
+        @CodableColor
+        public var secondaryForegroundColor: Unicolor
+    }
+}
+
+// MARK: - Account.Information.Look.Card + Codable
+
+extension Account.Information.Look.Card: Codable {}
+
+// MARK: - Account.Information.Look.Card + Sendable
+
+extension Account.Information.Look.Card: Sendable {}
+
+// MARK: - Account.Information.Look.Card + Hashable
+
+extension Account.Information.Look.Card: Hashable {}
