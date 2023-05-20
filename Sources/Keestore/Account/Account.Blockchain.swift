@@ -82,21 +82,30 @@ public extension Account.Blockchain {
         with credentials: Credentials,
         using key: DerivedKey
     ) throws -> Account.Blockchain {
-        let privateKey = try credentials.privateKey(for: chainInformation)
+        return try Account.Blockchain(
+            address: chainInformation.address(with: credentials, using: addressProvider),
+            chain: chainInformation,
+            credentials: EncryptedValue(decryptedValue: credentials, using: key)
+        )
+    }
+}
 
-        let address: Address
+public extension ChainInformation {
+    func address(
+        with credentials: Account.Blockchain.Credentials,
+        using addressProvider: Account.Blockchain.AddressProvider? = nil
+    ) throws -> Account.Blockchain.Address {
+        let privateKey = try credentials.privateKey(for: self)
+
+        let address: Account.Blockchain.Address
         if let addressProvider {
             address = try addressProvider.function(privateKey.publicKey.rawValue)
-        } else if let addressFormatting = chainInformation.addressFormatting {
+        } else if let addressFormatting = addressFormatting {
             address = try addressFormatting.addressProvider.function(privateKey.publicKey.rawValue)
         } else {
             throw Keestore.Error.unknownAddressFormat
         }
 
-        return try Account.Blockchain(
-            address: address,
-            chain: chainInformation,
-            credentials: EncryptedValue(decryptedValue: credentials, using: key)
-        )
+        return address
     }
 }
