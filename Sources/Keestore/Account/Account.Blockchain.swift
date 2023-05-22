@@ -99,9 +99,9 @@ public extension ChainInformation {
 
         let address: Account.Blockchain.Address
         if let addressProvider {
-            address = try addressProvider.function(privateKey.publicKey.rawValue)
+            address = try addressProvider.generator(privateKey.publicKey.rawValue)
         } else if let addressFormatting = addressFormatting {
-            address = try addressFormatting.addressProvider.function(privateKey.publicKey.rawValue)
+            address = try addressFormatting.provider.generator(privateKey.publicKey.rawValue)
         } else {
             throw Keestore.Error.unknownAddressFormat
         }
