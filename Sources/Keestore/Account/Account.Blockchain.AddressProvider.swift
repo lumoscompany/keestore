@@ -34,7 +34,7 @@ public extension Account.Blockchain.AddressProvider {
     }
 }
 
-extension ChainInformation.AddressFormatting {
+public extension ChainInformation.AddressFormatting {
     var provider: Account.Blockchain.AddressProvider {
         switch self {
         case .ethereum:
