@@ -44,3 +44,7 @@ public extension Keestore {
         accounts.removeAll(where: { $0.uuid == account.uuid })
     }
 }
+
+// MARK: Sendable
+
+extension Keestore: Sendable {}
