@@ -38,26 +38,48 @@ public struct DerivedKey {
 
         self.rawValue = .init(Data(hash.concreteBytes.sha256))
     }
-    
+
+    // MARK: Public
+
     public func perform(with body: (Data) throws -> Void) rethrows {
         try rawValue.perform(with: body)
     }
 
-    // MARK: Public
+    // MARK: Private
 
     /// - note: 32 bytes
     private let rawValue: SecureStorage
 }
 
-// MARK: - DerivedKey + Sendable
+// MARK: Sendable
 
 extension DerivedKey: Sendable {}
 
-// MARK: - DerivedKey + Hashable
+// MARK: Hashable
 
 extension DerivedKey: Hashable {}
 
-// MARK: - DerivedKey.Signature
+// MARK: CustomStringConvertible
+
+extension DerivedKey: CustomStringConvertible {
+    public var description: String {
+        "[DerivedKey]: ******"
+    }
+}
+
+// MARK: CustomDebugStringConvertible
+
+extension DerivedKey: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "[DerivedKey]: ******"
+    }
+}
+
+extension String.StringInterpolation {
+    mutating func appendInterpolation(_ value: DerivedKey) {
+        appendInterpolation(value.description)
+    }
+}
 
 ///  - note: Do not implement it by default due security.
 // extension DerivedKey: Codable {}
