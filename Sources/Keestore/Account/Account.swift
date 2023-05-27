@@ -37,4 +37,12 @@ extension Account: Sendable {}
 
 // MARK: Hashable
 
-extension Account: Hashable {}
+extension Account: Hashable {
+    public static func == (lhs: Account, rhs: Account) -> Bool {
+        lhs.uuid == rhs.uuid
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(uuid)
+    }
+}

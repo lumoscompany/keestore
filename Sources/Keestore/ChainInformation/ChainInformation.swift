@@ -53,7 +53,15 @@ extension ChainInformation: Sendable {}
 
 // MARK: Hashable
 
-extension ChainInformation: Hashable {}
+extension ChainInformation: Hashable {
+    public static func == (lhs: ChainInformation, rhs: ChainInformation) -> Bool {
+        lhs.name == rhs.name
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+}
 
 public extension BIP39.Digest {
     init(for chainInformation: ChainInformation) {
