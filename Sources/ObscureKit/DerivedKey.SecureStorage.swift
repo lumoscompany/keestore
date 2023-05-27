@@ -18,7 +18,7 @@ internal extension DerivedKey {
                 else {
                     fatalError("[SecureStorage]: Can't copy bytes from data")
                 }
-                
+
                 pointer.copyMemory(from: baseAddress, byteCount: kCCKeySizeAES256)
             })
         }
@@ -69,5 +69,27 @@ extension DerivedKey.SecureStorage: Hashable {
         perform(with: {
             hasher.combine($0)
         })
+    }
+}
+
+// MARK: - DerivedKey.SecureStorage + CustomStringConvertible
+
+extension DerivedKey.SecureStorage: CustomStringConvertible {
+    public var description: String {
+        "[DerivedKey.SecureStorage]: ******"
+    }
+}
+
+// MARK: - DerivedKey.SecureStorage + CustomDebugStringConvertible
+
+extension DerivedKey.SecureStorage: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "[DerivedKey.SecureStorage]: ******"
+    }
+}
+
+extension String.StringInterpolation {
+    mutating func appendInterpolation(_ value: DerivedKey.SecureStorage) {
+        appendInterpolation(value.description)
     }
 }
