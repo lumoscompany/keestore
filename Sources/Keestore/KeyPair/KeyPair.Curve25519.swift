@@ -58,10 +58,6 @@ public extension KeyPair.Curve25519.PublicKey {
     }
 }
 
-// MARK: - KeyPair.Curve25519.PublicKey + Codable
-
-extension KeyPair.Curve25519.PublicKey: Codable {}
-
 // MARK: - KeyPair.Curve25519.PublicKey + Sendable
 
 extension KeyPair.Curve25519.PublicKey: Sendable {}

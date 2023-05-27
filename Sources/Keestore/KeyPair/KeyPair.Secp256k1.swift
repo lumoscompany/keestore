@@ -66,10 +66,6 @@ public extension KeyPair.Secp256k1.PublicKey {
     }
 }
 
-// MARK: - KeyPair.Secp256k1.PublicKey + Codable
-
-extension KeyPair.Secp256k1.PublicKey: Codable {}
-
 // MARK: - KeyPair.Secp256k1.PublicKey + Sendable
 
 extension KeyPair.Secp256k1.PublicKey: Sendable {}
