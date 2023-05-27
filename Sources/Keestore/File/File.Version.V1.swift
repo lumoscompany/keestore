@@ -11,14 +11,14 @@ internal extension File.Version {
     struct V1 {
         // MARK: Lifecycle
 
-        internal init(signature: DerivedKey.Signature, accounts: [Account]) {
+        internal init(signature: DerivedKey.PublicSignature, accounts: [Account]) {
             self.signature = signature
             self.accounts = accounts
         }
 
         // MARK: Internal
 
-        internal let signature: DerivedKey.Signature
+        internal let signature: DerivedKey.PublicSignature
         internal let accounts: [Account]
     }
 }

@@ -12,14 +12,14 @@ import Foundation
 public struct Keestore {
     // MARK: Lifecycle
 
-    public init(signature: DerivedKey.Signature, accounts: [Account]) {
+    public init(signature: DerivedKey.PublicSignature, accounts: [Account]) {
         self.signature = signature
         self.accounts = accounts
     }
 
     // MARK: Public
 
-    private(set) public var signature: DerivedKey.Signature
+    private(set) public var signature: DerivedKey.PublicSignature
     private(set) public var accounts: [Account]
 }
 
@@ -27,7 +27,7 @@ public struct Keestore {
 
 public extension Keestore {
     mutating func append(_ account: Account, using key: DerivedKey) throws {
-        guard key.validate(signature)
+        guard signature.validate(key: key)
         else {
             throw Error.wrongKey
         }
@@ -36,7 +36,7 @@ public extension Keestore {
     }
 
     mutating func remove(_ account: Account, using key: DerivedKey) throws {
-        guard key.validate(signature)
+        guard signature.validate(key: key)
         else {
             throw Error.wrongKey
         }

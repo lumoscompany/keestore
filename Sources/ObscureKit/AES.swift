@@ -12,14 +12,18 @@ public struct AES {
     // MARK: Lifecycle
 
     public init(_ key: DerivedKey) {
-        self.key = SymmetricKey(key)
+        self.key = key
     }
 
     // MARK: Public
 
     /// - parameter data: Data to encrypt
     public func encrypt(_ data: Data) -> Data? {
-        let seal = try? CryptoKit.AES.GCM.seal(data, using: key)
+        var seal: CryptoKit.AES.GCM.SealedBox?
+        try? key.perform(with: {
+            let key = SymmetricKey(data: $0)
+            seal = try CryptoKit.AES.GCM.seal(data, using: key)
+        })
         return seal?.combined
     }
 
@@ -30,10 +34,15 @@ public struct AES {
             return nil
         }
 
-        return try? CryptoKit.AES.GCM.open(box, using: key)
+        var result: Data?
+        try? key.perform(with: {
+            let key = SymmetricKey(data: $0)
+            result = try CryptoKit.AES.GCM.open(box, using: key)
+        })
+        return result
     }
 
     // MARK: Private
 
-    private let key: SymmetricKey
+    private let key: DerivedKey
 }

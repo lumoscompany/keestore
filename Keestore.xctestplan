@@ -25,6 +25,13 @@
         "identifier" : "KeestoreTests",
         "name" : "KeestoreTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "ObscureKitTests",
+        "name" : "ObscureKitTests"
+      }
     }
   ],
   "version" : 1

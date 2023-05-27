@@ -48,5 +48,9 @@ let package = Package(
             name: "KeestoreTests",
             dependencies: ["Keestore"]
         ),
+        .testTarget(
+            name: "ObscureKitTests",
+            dependencies: ["ObscureKit"]
+        ),
     ]
 )
