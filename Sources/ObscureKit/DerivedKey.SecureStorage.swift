@@ -39,6 +39,11 @@ internal extension DerivedKey {
             try body(data)
         }
 
+        internal func perform(with body: (Data) async throws -> Void) async rethrows {
+            let data = Data(bytesNoCopy: pointer, count: kCCKeySizeAES256, deallocator: .none)
+            try await body(data)
+        }
+
         // MARK: Private
 
         private let pointer: UnsafeMutableRawPointer = .allocate(

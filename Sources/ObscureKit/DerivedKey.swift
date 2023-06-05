@@ -45,6 +45,10 @@ public struct DerivedKey {
         try rawValue.perform(with: body)
     }
 
+    public func perform(with body: (Data) async throws -> Void) async rethrows {
+        try await rawValue.perform(with: body)
+    }
+
     // MARK: Private
 
     /// - note: 32 bytes
