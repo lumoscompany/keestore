@@ -29,6 +29,8 @@ internal extension DerivedKey {
         }
 
         deinit {
+            let zeros = [UInt8](repeating: 0, count: kCCKeySizeAES256)
+            pointer.copyMemory(from: zeros, byteCount: kCCKeySizeAES256)
             pointer.deallocate()
         }
 
