@@ -112,7 +112,7 @@ public extension KeyPair.Secp256k1.PrivateKey {
         let result = try ObscureKit.secp256k1.sign(
             value: Data(data).concreteBytes,
             with: rawValue,
-            hashing: true
+            hashing: false
         ).concreteBytes
         return Data(result)
     }
