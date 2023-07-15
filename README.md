@@ -1,14 +1,8 @@
-# Wolstore [![Tests](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml/badge.svg)](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml)
+# Keestore [![Tests](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml/badge.svg)](https://github.com/lumoscompany/keestore/actions/workflows/swift.yml)
 
-Pure Swift account manager for some blockchain networks
+Pure Swift account manager for web2 & web3
 
 - BIP32, BIP39, BIP44
-
-## Maybe supported networks
-
-- Ethereum
-- TON
-- TRON
 
 ## Installation
 
@@ -21,7 +15,7 @@ Pure Swift account manager for some blockchain networks
 
 ## Usage samples
 
-### Importing blockhain accounts
+### Importing blockchain accounts
 
 ```swift
 import Keestore
@@ -41,12 +35,13 @@ let account = try Account.Blockchain.create(
 print(account.address)
 ```
 
-### Getting accounts using .keestore file
+### Storing accounts using .keestore document
 
 ```swift
+
 let fileName = "default"
 let directoryURL = URL(fileURLWithPath: "file:///")
-let file = File(direcotryURL: directoryURL, fileNamed: fileName)
+let file = Document(direcotryURL: directoryURL, fileNamed: fileName)
 
 guard file.isExists
 else {
@@ -64,7 +59,6 @@ case let .blockchain(value):
 default:
     break
 }
-
 ```
 
 ### Signing
