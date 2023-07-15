@@ -34,15 +34,3 @@ extension ChainInformation.B39: Sendable {}
 // MARK: - ChainInformation.B39 + Hashable
 
 extension ChainInformation.B39: Hashable {}
-
-public extension Optional where Wrapped == ChainInformation.B39 {
-    /// - note: If nil, returns Ethereum configuration (`12`words, pkcs5 algorithm)
-    var value: Wrapped {
-        switch self {
-        case .none:
-            return .init(words: .w12, algorithm: .ethereum())
-        case let .some(wrapped):
-            return wrapped
-        }
-    }
-}

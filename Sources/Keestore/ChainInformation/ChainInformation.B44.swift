@@ -56,15 +56,3 @@ extension ChainInformation.B44: Sendable {}
 // MARK: - ChainInformation.B44 + Hashable
 
 extension ChainInformation.B44: Hashable {}
-
-public extension Optional where Wrapped == ChainInformation.B44 {
-    /// - note: If nil, returns Ethereum coin (`195'`) as default value
-    var value: Wrapped {
-        switch self {
-        case .none:
-            return .init(coin: .init("195`"))
-        case let .some(wrapped):
-            return wrapped
-        }
-    }
-}

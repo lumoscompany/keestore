@@ -15,8 +15,8 @@ public struct ChainInformation {
         icon: InsertedAsset?,
         signingProtocol: SigningProtocol,
         addressFormatting: AddressFormatting?,
-        b32: B32?,
-        b39: B39?,
+        b32: B32,
+        b39: B39,
         b44: B44?
     ) {
         self.name = name
@@ -38,8 +38,8 @@ public struct ChainInformation {
     public let signingProtocol: SigningProtocol
     public let addressFormatting: AddressFormatting?
 
-    public let b32: B32?
-    public let b39: B39?
+    public let b32: B32
+    public let b39: B39
     public let b44: B44?
 }
 
@@ -65,12 +65,12 @@ extension ChainInformation: Hashable {
 
 public extension BIP39.Digest {
     init(for chainInformation: ChainInformation) {
-        let b39 = chainInformation.b39.value
+        let b39 = chainInformation.b39
         self.init(length: b39.words, algorithm: b39.algorithm)
     }
 
     init(for chainInformation: ChainInformation, with mnemonica: Mnemonica) throws {
-        try self.init(mnemonica, algorithm: chainInformation.b39.value.algorithm)
+        try self.init(mnemonica, algorithm: chainInformation.b39.algorithm)
     }
 }
 
