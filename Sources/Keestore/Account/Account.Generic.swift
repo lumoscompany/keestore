@@ -10,12 +10,7 @@ public extension Account {
     struct Generic {
         // MARK: Lifecycle
 
-        public init(
-            origins: [URL],
-            login: String,
-            credentials: EncryptedValue<Credentials>
-        ) {
-            self.login = login
+        public init(origins: [URL], credentials: EncryptedValue<Credentials>) {
             self.origins = origins
             self.credentials = credentials
         }
@@ -23,7 +18,6 @@ public extension Account {
         // MARK: Public
 
         public var origins: [URL]
-        public var login: String
         public var credentials: EncryptedValue<Credentials>
     }
 }
@@ -44,7 +38,7 @@ extension Account.Generic: Hashable {}
 
 public extension Account.Generic {
     enum Credentials {
-        case password(Plaintext, OTP?)
+        case password(login: Plaintext, password: Plaintext, otp: OTP?)
 
         // MARK: Public
 
