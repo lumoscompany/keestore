@@ -19,12 +19,10 @@ public struct AES {
 
     /// - parameter data: Data to encrypt
     public func encrypt(_ data: Data) -> Data? {
-        var seal: CryptoKit.AES.GCM.SealedBox?
         try? key.perform(with: {
             let key = SymmetricKey(data: $0)
-            seal = try CryptoKit.AES.GCM.seal(data, using: key)
+            return try CryptoKit.AES.GCM.seal(data, using: key).combined
         })
-        return seal?.combined
     }
 
     /// - parameter data: Data to decrypt
@@ -34,12 +32,10 @@ public struct AES {
             return nil
         }
 
-        var result: Data?
-        try? key.perform(with: {
+        return try? key.perform(with: {
             let key = SymmetricKey(data: $0)
-            result = try CryptoKit.AES.GCM.open(box, using: key)
+            return try CryptoKit.AES.GCM.open(box, using: key)
         })
-        return result
     }
 
     // MARK: Private

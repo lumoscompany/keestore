@@ -41,11 +41,11 @@ public struct DerivedKey {
 
     // MARK: Public
 
-    public func perform(with body: (Data) throws -> Void) rethrows {
+    public func perform<T>(with body: (Data) throws -> T) rethrows -> T {
         try rawValue.perform(with: body)
     }
 
-    public func perform(with body: (Data) async throws -> Void) async rethrows {
+    public func perform<T>(with body: (Data) async throws -> T) async rethrows -> T {
         try await rawValue.perform(with: body)
     }
 

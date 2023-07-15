@@ -36,14 +36,14 @@ internal extension DerivedKey {
 
         // MARK: Internal
 
-        internal func perform(with body: (Data) throws -> Void) rethrows {
+        internal func perform<T>(with body: (Data) throws -> T) rethrows -> T {
             let data = Data(bytesNoCopy: pointer, count: kCCKeySizeAES256, deallocator: .none)
-            try body(data)
+            return try body(data)
         }
 
-        internal func perform(with body: (Data) async throws -> Void) async rethrows {
+        internal func perform<T>(with body: (Data) async throws -> T) async rethrows -> T {
             let data = Data(bytesNoCopy: pointer, count: kCCKeySizeAES256, deallocator: .none)
-            try await body(data)
+            return try await body(data)
         }
 
         // MARK: Private
