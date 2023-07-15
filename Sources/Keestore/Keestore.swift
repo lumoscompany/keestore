@@ -12,13 +12,28 @@ import Foundation
 public struct Keestore {
     // MARK: Lifecycle
 
-    public init(signature: DerivedKey.PublicSignature, accounts: [Account]) {
+    public init?(key: DerivedKey) {
+        guard let signature = DerivedKey.PublicSignature(key: key)
+        else {
+            return nil
+        }
+
+        self.init(
+            version: 0,
+            signature: signature,
+            accounts: []
+        )
+    }
+
+    public init(version: Int, signature: DerivedKey.PublicSignature, accounts: [Account]) {
+        self.version = version
         self.signature = signature
         self.accounts = accounts
     }
 
     // MARK: Public
 
+    private(set) public var version: Int
     private(set) public var signature: DerivedKey.PublicSignature
     private(set) public var accounts: [Account]
 }
@@ -27,24 +42,31 @@ public struct Keestore {
 
 public extension Keestore {
     mutating func append(_ account: Account, using key: DerivedKey) throws {
-        guard signature.validate(key: key)
-        else {
-            throw Error.wrongKey
-        }
-
+        try validate(key)
         accounts.append(account)
     }
 
     mutating func remove(_ account: Account, using key: DerivedKey) throws {
+        try validate(key)
+        accounts.removeAll(where: { $0.uuid == account.uuid })
+    }
+
+    private func validate(_ key: DerivedKey) throws {
         guard signature.validate(key: key)
         else {
             throw Error.wrongKey
         }
-
-        accounts.removeAll(where: { $0.uuid == account.uuid })
     }
 }
+
+// MARK: Codable
+
+extension Keestore: Codable {}
 
 // MARK: Sendable
 
 extension Keestore: Sendable {}
+
+// MARK: Hashable
+
+extension Keestore: Hashable {}

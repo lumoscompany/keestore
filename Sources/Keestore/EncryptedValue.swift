@@ -11,13 +11,7 @@ public struct EncryptedValue<T> where T: Codable {
     // MARK: Lifecycle
 
     public init(decryptedValue: T, using key: DerivedKey) throws {
-        let encodedValue: Data
-        do {
-            encodedValue = try JSONEncoder.keestore.encode(decryptedValue)
-        } catch {
-            throw Keestore.Error.encodingFailed(error)
-        }
-
+        let encodedValue = try JSONEncoder.encode(decryptedValue)
         guard let encryptedValue = AES(key).encrypt(encodedValue)
         else {
             throw Keestore.Error.encryptionFailed
@@ -40,14 +34,7 @@ public struct EncryptedValue<T> where T: Codable {
             throw Keestore.Error.decryptionFailed
         }
 
-        let decodedValue: T
-        do {
-            decodedValue = try JSONDecoder.keestore.decode(T.self, from: decryptedValue)
-        } catch {
-            throw Keestore.Error.decodingFailed(error)
-        }
-
-        return decodedValue
+        return try JSONDecoder.decode(T.self, from: decryptedValue)
     }
 }
 
