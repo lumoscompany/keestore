@@ -12,7 +12,7 @@ public struct ChainInformation {
 
     init(
         name: String,
-        icon: InsertedAsset?,
+        icon: CodableResource?,
         signingProtocol: SigningProtocol,
         addressFormatting: AddressFormatting?,
         b32: B32,
@@ -33,7 +33,7 @@ public struct ChainInformation {
     // MARK: Public
 
     public let name: String
-    public let icon: InsertedAsset?
+    public let icon: CodableResource?
 
     public let signingProtocol: SigningProtocol
     public let addressFormatting: AddressFormatting?

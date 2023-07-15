@@ -4,75 +4,84 @@
 
 #if canImport(UIKit)
 import UIKit
-public typealias Unimage = UIImage
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
-public typealias Unimage = NSImage
 #else
 // TODO:
 #endif
 
-// MARK: - CodableImage
+// MARK: - PlatformImage
 
-@propertyWrapper
-public struct CodableImage {
+public struct PlatformImage: RawRepresentable {
     // MARK: Lifecycle
 
-    public init(wrappedValue: Unimage) {
-        self.wrappedValue = wrappedValue
+    public init(rawValue: RawValue) {
+        self.rawValue = rawValue
     }
 
     // MARK: Public
 
-    public var wrappedValue: Unimage
+    public var rawValue: RawValue
+}
+
+public extension PlatformImage {
+    #if canImport(UIKit)
+    typealias RawValue = UIImage
+    #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+    typealias RawValue = NSImage
+    #else
+    // TODO:
+    #endif
 }
 
 // MARK: Codable
 
-extension CodableImage: Codable {
+extension PlatformImage: Codable {
     enum CodingKeys: CodingKey {
-        case data
+        case rawValue
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let data = try container.decode(Data.self, forKey: .data)
+        let data = try container.decode(Data.self, forKey: .rawValue)
 
-        guard let image = Unimage(data: data)
+        guard let rawValue = RawValue(data: data)
         else {
             throw DecodingError.dataCorruptedError(
-                forKey: CodingKeys.data,
+                forKey: CodingKeys.rawValue,
                 in: container,
-                debugDescription: "Invalid `data` image."
+                debugDescription: "Invalid image `rawValue`"
             )
         }
 
-        self.wrappedValue = image
+        self.init(rawValue: rawValue)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        guard let data = wrappedValue.pngData()
+        guard let data = rawValue.pngData()
         else {
-            throw EncodingError.invalidValue(wrappedValue, .init(
-                codingPath: [CodingKeys.data],
+            throw EncodingError.invalidValue((), .init(
+                codingPath: [CodingKeys.rawValue],
                 debugDescription: "Can't convert image to PNG representation."
             ))
         }
 
-        try container.encode(data, forKey: .data)
+        try container.encode(data, forKey: .rawValue)
     }
 }
 
 // MARK: Sendable
 
-extension CodableImage: Sendable {}
+extension PlatformImage: Sendable {}
 
 // MARK: Hashable
 
-extension CodableImage: Hashable {}
+extension PlatformImage: Hashable {}
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+extension NSImage: @unchecked Sendable {}
+
 private extension NSImage {
     func pngData() -> Data? {
         let bitmap = NSBitmapImageRep(
@@ -113,6 +122,4 @@ private extension NSImage {
         return bitmap.representation(using: .png, properties: [:])
     }
 }
-
-extension NSImage: @unchecked Sendable {}
 #endif

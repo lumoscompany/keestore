@@ -4,32 +4,43 @@
 
 #if canImport(UIKit)
 import UIKit
-public typealias Unicolor = UIColor
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
-public typealias Unicolor = NSColor
 #else
 // TODO:
 #endif
 
-// MARK: - CodableColor
+// MARK: - PlatformColor
 
-@propertyWrapper
-public struct CodableColor {
+public struct PlatformColor: RawRepresentable {
     // MARK: Lifecycle
 
-    public init(wrappedValue: Unicolor) {
-        self.wrappedValue = wrappedValue
+    public init(rawValue: RawValue) {
+        self.rawValue = rawValue
     }
 
     // MARK: Public
 
-    public var wrappedValue: Unicolor
+    public var rawValue: RawValue
 }
 
-// MARK: Codable
+public extension PlatformColor {
+    #if canImport(UIKit)
+    typealias RawValue = UIColor
+    #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+    typealias RawValue = NSColor
+    #else
+    // TODO:
+    #endif
+}
 
-extension CodableColor: Codable {
+// MARK: - PlatformColor.RawValue + Sendable
+
+extension PlatformColor.RawValue: @unchecked Sendable {}
+
+// MARK: - PlatformColor + Codable
+
+extension PlatformColor: Codable {
     enum CodingKeys: CodingKey {
         case `default`
         case dark
@@ -41,7 +52,7 @@ extension CodableColor: Codable {
         let _default = try container.decode(String.self, forKey: .default)
         let _dark: String? = try container.decode(String.self, forKey: .dark)
 
-        guard let defaultColor = Unicolor(hexRepresentation: _default)
+        guard let defaultColor = RawValue(hexRepresentation: _default)
         else {
             throw DecodingError.dataCorruptedError(
                 forKey: CodingKeys.default,
@@ -50,9 +61,9 @@ extension CodableColor: Codable {
             )
         }
 
-        var darkColor: Unicolor?
+        var darkColor: RawValue?
         if let _dark {
-            guard let color = Unicolor(hexRepresentation: _dark)
+            guard let color = RawValue(hexRepresentation: _dark)
             else {
                 throw DecodingError.dataCorruptedError(
                     forKey: CodingKeys.default,
@@ -64,18 +75,26 @@ extension CodableColor: Codable {
             darkColor = color
         }
 
-        self.wrappedValue = Unicolor(default: defaultColor, dark: darkColor)
+        self.init(rawValue: RawValue(default: defaultColor, dark: darkColor))
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(wrappedValue.default.hexRepresentation, forKey: .default)
-        try container.encode(wrappedValue.dark.hexRepresentation, forKey: .dark)
+        try container.encode(rawValue.default.hexRepresentation, forKey: .default)
+        try container.encode(rawValue.dark.hexRepresentation, forKey: .dark)
     }
 }
 
-internal extension Unicolor {
+// MARK: - PlatformColor + Sendable
+
+extension PlatformColor: Sendable {}
+
+// MARK: - PlatformColor + Hashable
+
+extension PlatformColor: Hashable {}
+
+internal extension PlatformColor.RawValue {
     convenience init?(hexRepresentation: String) {
         var value = hexRepresentation
         if value.hasPrefix("#") {
@@ -114,16 +133,16 @@ internal extension Unicolor {
     }
 }
 
-private extension Unicolor {
-    var `default`: Unicolor {
+private extension PlatformColor.RawValue {
+    var `default`: PlatformColor.RawValue {
         resolvedColor(using: .default)
     }
 
-    var dark: Unicolor {
+    var dark: PlatformColor.RawValue {
         resolvedColor(using: .dark)
     }
 
-    convenience init(default _default: Unicolor, dark: Unicolor?) {
+    convenience init(default _default: PlatformColor.RawValue, dark: PlatformColor.RawValue?) {
         self.init(provider: { unistyle in
             switch unistyle {
             case .dark:
@@ -137,7 +156,7 @@ private extension Unicolor {
 
 #if canImport(UIKit)
 private extension UIColor {
-    convenience init(provider: @escaping (CodableAppearance) -> UIColor) {
+    convenience init(provider: @escaping (PlatformAppearance) -> UIColor) {
         self.init(dynamicProvider: { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
@@ -148,7 +167,7 @@ private extension UIColor {
         })
     }
 
-    func resolvedColor(using appearance: CodableAppearance) -> UIColor {
+    func resolvedColor(using appearance: PlatformAppearance) -> UIColor {
         switch appearance {
         case .default:
             return resolvedColor(with: .init(userInterfaceStyle: .dark))
@@ -160,7 +179,7 @@ private extension UIColor {
 
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
 private extension NSColor {
-    convenience init(provider: @escaping (CodableAppearance) -> NSColor) {
+    convenience init(provider: @escaping (PlatformAppearance) -> NSColor) {
         self.init(name: nil, dynamicProvider: { appearance in
             switch appearance.name {
             case .darkAqua:
@@ -171,35 +190,28 @@ private extension NSColor {
         })
     }
 
-    func resolvedColor(using appearance: CodableAppearance) -> NSColor {
-        let previous = NSAppearance.current
-        let color: NSColor
-
+    func resolvedColor(using appearance: PlatformAppearance) -> NSColor {
+        let _appearance: NSAppearance?
         switch appearance {
         case .default:
-            NSAppearance.current = NSAppearance(named: .darkAqua)
-            color = NSColor(cgColor: cgColor)!
+            _appearance = NSAppearance(named: .darkAqua)
         case .dark:
-            NSAppearance.current = NSAppearance(named: .aqua)
-            color = NSColor(cgColor: cgColor)!
+            _appearance = NSAppearance(named: .aqua)
         }
 
-        NSAppearance.current = previous
+        var color = self
+        _appearance?.performAsCurrentDrawingAppearance({
+            guard let _color = NSColor(cgColor: cgColor)
+            else {
+                return
+            }
+
+            color = _color
+        })
+
         return color
     }
 }
 #else
 // TODO:
 #endif
-
-// MARK: - CodableColor + Sendable
-
-extension CodableColor: Sendable {}
-
-// MARK: - CodableColor + Hashable
-
-extension CodableColor: Hashable {}
-
-// MARK: - Unicolor + Sendable
-
-extension Unicolor: @unchecked Sendable {}

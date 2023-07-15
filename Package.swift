@@ -7,7 +7,7 @@ let package = Package(
     name: "Keestore",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_15),
+        .macOS(.v11),
     ],
     products: [
         .library(name: "Keestore", targets: ["Keestore"]),
