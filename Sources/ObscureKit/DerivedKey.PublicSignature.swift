@@ -35,59 +35,33 @@ extension DerivedKey.PublicSignature: Sendable {}
 extension DerivedKey.PublicSignature: Hashable {}
 
 public extension DerivedKey.PublicSignature {
-    init(key: DerivedKey) {
-        let signature = Curve25519.Signing.PrivateKey.signature(for: key)
-        self.init(rawValue: signature)
+    private static let Header = [UInt8](repeating: 0x2A, count: 64)
+
+    init?(key: DerivedKey) {
+        var entropy = [UInt8](repeating: 0, count: 64)
+        _ = SecRandomCopyBytes(kSecRandomDefault, entropy.count, &entropy)
+
+        let data = Data(DerivedKey.PublicSignature.Header + entropy)
+        guard let rawValue = AES(key).encrypt(data)
+        else {
+            return nil
+        }
+
+        self.init(rawValue: rawValue)
     }
 
     func validate(key: DerivedKey) -> Bool {
-        Curve25519.Signing.PrivateKey.validate(signature: rawValue, for: key)
-    }
-}
-
-private extension Curve25519.Signing.PrivateKey {
-    static func validate(signature: Data, for key: DerivedKey) -> Bool {
-        let privateKey = Self(key: key)
-        return privateKey.publicKey.isValidSignature(signature, for: _signatureData)
-    }
-
-    static func signature(for key: DerivedKey) -> Data {
-        let privateKey = Self(key: key)
-        guard let signature = try? privateKey.signature(for: _signatureData)
+        guard let data = AES(key).decrypt(rawValue)
         else {
-            fatalError("[Curve25519.Signing.PrivateKey]: Curve25519 signature error.")
-        }
-        return signature
-    }
-
-    private init(key: DerivedKey) {
-        var hash: (any ContiguousBytes)!
-        key.perform(with: {
-            hash = hmac(SHA512.self, bytes: [UInt8](), key: $0)
-        })
-        
-        let seed = try? PKCS5.PBKDF2SHA512(
-            password: hash.concreteBytes.sha512,
-            salt: [UInt8]("derived key signature seed".utf8),
-            iterations: UInt32(100_000),
-            derivedKeyLength: 32
-        )
-
-        guard let seed
-        else {
-            fatalError("[]: PKCS5.PBKDF2SHA512 error.")
+            return false
         }
 
-        let privateKey = try? Curve25519.Signing.PrivateKey(rawRepresentation: seed)
-        guard let privateKey
+        let hex = [UInt8](data)
+        guard hex.count == 128
         else {
-            fatalError("[KEY32.Signature]: Curve25519 error.")
+            return false
         }
 
-        self = privateKey
-    }
-
-    private static var _signatureData: Data {
-        Data([UInt8]("derived key signature data".utf8))
+        return Array(hex[0 ..< 64]) == DerivedKey.PublicSignature.Header
     }
 }

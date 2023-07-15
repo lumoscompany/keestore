@@ -11,7 +11,7 @@ import Foundation
 public struct DerivedKey {
     // MARK: Lifecycle
 
-    /// - parameter rawValue: 32 bytes buffer (SHA256)
+    /// - parameter rawValue: 32 bytes buffer (AES256)
     public init?(rawValue: Data) {
         guard rawValue.count == kCCKeySizeAES256
         else {
