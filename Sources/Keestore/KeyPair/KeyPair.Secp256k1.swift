@@ -104,16 +104,15 @@ public extension KeyPair.Secp256k1.PrivateKey {
             ).concreteBytes
             return KeyPair.Secp256k1.PublicKey(rawValue: Data(publicKey))
         } catch {
-            fatalError(error.localizedDescription)
+            fatalError("\(error)")
         }
     }
 
     func sign(_ data: any DataProtocol) throws -> any DataProtocol {
         let result = try ObscureKit.secp256k1.sign(
             value: Data(data).concreteBytes,
-            with: rawValue,
-            hashing: false
-        ).concreteBytes
+            with: rawValue
+        ).combined.concreteBytes
         return Data(result)
     }
 }

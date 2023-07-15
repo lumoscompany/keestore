@@ -92,12 +92,31 @@ public extension secp256k1 {
         return serializedPublicKey
     }
 
+    struct Signature {
+        // MARK: Lifecycle
+
+        init(r: any ContiguousBytes, s: any ContiguousBytes, recovery: UInt8) {
+            self.r = r
+            self.s = s
+            self.recovery = recovery
+        }
+
+        // MARK: Public
+
+        public let r: any ContiguousBytes
+        public let s: any ContiguousBytes
+        public let recovery: UInt8
+
+        public var combined: some ContiguousBytes {
+            r.concreteBytes + s.concreteBytes + [recovery]
+        }
+    }
+
     /// - returns: Signature of given `value` as a `ContiguousBytes`
     static func sign(
         value: any ContiguousBytes,
-        with secretKey: any ContiguousBytes,
-        hashing: Bool
-    ) throws -> some ContiguousBytes {
+        with secretKey: any ContiguousBytes
+    ) throws -> Signature {
         let flags = UInt32(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY)
         guard let context = secp256k1_context_create(flags)
         else {
@@ -106,7 +125,7 @@ public extension secp256k1 {
 
         defer { secp256k1_context_destroy(context) }
 
-        var value = hashing ? keccak256(value).concreteBytes : value.concreteBytes
+        var value = value.concreteBytes
         var secretKey = secretKey.concreteBytes
 
         let recoverableSignature = UnsafeMutablePointer<secp256k1_ecdsa_recoverable_signature>
@@ -137,13 +156,18 @@ public extension secp256k1 {
             recoverableSignature
         )
 
-        let outputWithRecID = UnsafeMutablePointer<UInt8>.allocate(capacity: 65)
-        defer { outputWithRecID.deallocate() }
+        guard recID < Int32(UInt8.max)
+        else {
+            throw secp256k1.Error.unableCreationSignatureECDSA
+        }
 
-        outputWithRecID.assign(from: output, count: 64)
-        outputWithRecID.advanced(by: 64).pointee = UInt8(recID)
+        let _output = UnsafeMutablePointer<UInt8>.allocate(capacity: 65)
+        defer { _output.deallocate() }
 
-        return Data(bytes: outputWithRecID, count: 65)
+        _output.update(from: output, count: 64)
+        let data = Data(bytes: _output, count: 64)
+        
+        return Signature(r: data[0 ..< 32], s: data[32 ..< 64], recovery: UInt8(recID))
     }
 }
 

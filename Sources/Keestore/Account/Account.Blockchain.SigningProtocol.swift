@@ -24,7 +24,8 @@ public extension Account.Blockchain {
 
 public extension Account.Blockchain.SigningProtocol {
     func sign(_ data: any DataProtocol) throws -> any DataProtocol {
-        try credentials.privateKey(for: chain).sign(data)
+        let hash = chain.signingProtocol.hashingFunction.process(Data(data))
+        return try credentials.privateKey(for: chain).sign(hash.concreteBytes)
     }
 
     func check(signature: any DataProtocol, for data: any DataProtocol) throws -> Bool {
