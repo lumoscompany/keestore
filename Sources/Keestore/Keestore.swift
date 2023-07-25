@@ -46,6 +46,21 @@ public extension Keestore {
         accounts.append(account)
     }
 
+    mutating func update(_ account: Account, using key: DerivedKey) throws {
+        try validate(key)
+        
+        let index = accounts.firstIndex(where: {
+            $0.uuid == account.uuid
+        })
+        
+        guard let index
+        else {
+            throw Error.accountNotExists
+        }
+        
+        accounts[index] = account
+    }
+
     mutating func remove(_ account: Account, using key: DerivedKey) throws {
         try validate(key)
         accounts.removeAll(where: { $0.uuid == account.uuid })

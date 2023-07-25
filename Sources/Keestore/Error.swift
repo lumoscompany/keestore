@@ -10,6 +10,8 @@ public extension Keestore {
     enum Error {
         case unknownFileVersion(Int)
         case unknownAddressFormat
+        
+        case accountNotExists
         case wrongKey
 
         case encryptionFailed
@@ -29,6 +31,8 @@ extension Keestore.Error: LocalizedError {
             return "[Keestore.Error]: Can't parse `.keestore`, unknown version -  `\(version)`."
         case .wrongKey:
             return "[Keestore.Error]: Wrong key."
+        case .accountNotExists:
+            return "[Keestore.Error]: Couldn't find account."
         case .unknownAddressFormat:
             return "[Keestore.Error]: Unknown address format."
         case .encryptionFailed:
