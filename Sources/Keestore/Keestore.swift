@@ -48,16 +48,16 @@ public extension Keestore {
 
     mutating func update(_ account: Account, using key: DerivedKey) throws {
         try validate(key)
-        
+
         let index = accounts.firstIndex(where: {
             $0.uuid == account.uuid
         })
-        
+
         guard let index
         else {
             throw Error.accountNotExists
         }
-        
+
         accounts[index] = account
     }
 
@@ -65,8 +65,27 @@ public extension Keestore {
         try validate(key)
         accounts.removeAll(where: { $0.uuid == account.uuid })
     }
+}
 
-    private func validate(_ key: DerivedKey) throws {
+// MARK: - Keestore + Key
+
+public extension Keestore {
+    mutating func change(_ nkey: DerivedKey, using key: DerivedKey) throws {
+        try validate(key)
+
+        guard var keestore = Keestore(key: nkey)
+        else {
+            throw Error.encryptionFailed
+        }
+
+        keestore.accounts = try accounts.map({
+            try $0.change(nkey, with: key)
+        })
+
+        self = keestore
+    }
+
+    func validate(_ key: DerivedKey) throws {
         guard signature.validate(key: key)
         else {
             throw Error.wrongKey

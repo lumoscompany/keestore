@@ -25,6 +25,41 @@ public struct Account {
     public var view: ViewRepresentation
 }
 
+internal extension Account {
+    func change(_ nkey: DerivedKey, with key: DerivedKey) throws -> Account {
+        switch kind {
+        case let .blockchain(blockchain):
+            guard let credentials = blockchain.credentials
+            else {
+                return self
+            }
+
+            let _credentials = try credentials.decrypt(using: key)
+            return try .init(
+                uuid: uuid,
+                name: name,
+                kind: .blockchain(.init(
+                    address: blockchain.address,
+                    chain: blockchain.chain,
+                    credentials: .init(decryptedValue: _credentials, using: nkey)
+                )),
+                view: view
+            )
+        case let .generic(generic):
+            let _credentials = try generic.credentials.decrypt(using: key)
+            return try .init(
+                uuid: uuid,
+                name: name,
+                kind: .generic(.init(
+                    origins: generic.origins,
+                    credentials: .init(decryptedValue: _credentials, using: nkey)
+                )),
+                view: view
+            )
+        }
+    }
+}
+
 // MARK: Codable
 
 extension Account: Codable {}
