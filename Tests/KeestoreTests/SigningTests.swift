@@ -62,7 +62,16 @@ final class SigningTests: XCTestCase {
 
             try $0.signs.forEach({
                 let data = Data(hexRepresentation: $0.key)
-                let signature = try signer.sign(data)
+                let signature = try signer.sign(data: data)
+                XCTAssertEqual(
+                    [UInt8](signature),
+                    [UInt8](hexRepresentation: $0.value)
+                )
+            })
+
+            try $0.messages.forEach({
+                let message = $0.key
+                let signature = try signer.sign(message: message)
                 XCTAssertEqual(
                     [UInt8](signature),
                     [UInt8](hexRepresentation: $0.value)
@@ -81,11 +90,15 @@ private var vectors0: [(mnemonica: String, signs: [String: String])] = [
     ),
 ]
 
-private var vectors1: [(mnemonica: String, signs: [String: String])] = [
+private var vectors1: [(mnemonica: String, signs: [String: String], messages: [String: String])] = [
     (
         "solve volcano that zebra miss dune vacuum emotion phone offer smoke stumble",
         [
             "2632E314A000": "3fe66ff89780b6e47d8cd14d2c8fb8cc33ed44e67ddaf24d26122e38fa801b25698bf215e9e7236256de5b3b69136253d89a873cd76e73bf0f02a34f2f777bda00",
+        ],
+        [
+            "hello world": "868ae148fb08919e062a7ef98736c7e8f152adbb858a8dd7eeeab792081ce5683d7cc59ac654c584c59dc60c51c9f77e67e3acb538e6f7a4ba513381602b2d4c00",
+            // 1b - 27 ??
         ]
     ),
 ]

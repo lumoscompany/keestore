@@ -23,7 +23,32 @@ public extension Account.Blockchain {
 }
 
 public extension Account.Blockchain.SigningProtocol {
-    func sign(_ data: any DataProtocol) throws -> any DataProtocol {
+    func sign(message: String) throws -> any DataProtocol {
+        var rawValue = [UInt8]()
+        let messageSigningPrefix = chain.signingProtocol.messageSigningPrefix
+
+        if let messageSigningPrefix {
+            if let firstByte = messageSigningPrefix.firstByte {
+                rawValue.append(firstByte)
+            }
+
+            let prefixText = messageSigningPrefix.prefixText
+            rawValue.append(contentsOf: [UInt8](prefixText.utf8))
+        }
+
+        let messageBytes = [UInt8](message.utf8)
+
+        rawValue.append(contentsOf: [UInt8]("\(messageBytes.count)".utf8))
+        rawValue.append(contentsOf: messageBytes)
+
+        if let hashingFunction = messageSigningPrefix?.hashingFunction {
+            rawValue = hashingFunction.process(rawValue).concreteBytes
+        }
+
+        return try credentials.privateKey(for: chain).sign(rawValue)
+    }
+
+    func sign(data: any DataProtocol) throws -> any DataProtocol {
         let hash = chain.signingProtocol.hashingFunction.process(Data(data))
         return try credentials.privateKey(for: chain).sign(hash.concreteBytes)
     }

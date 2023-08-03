@@ -79,7 +79,11 @@ public extension ChainInformation {
         self.init(
             name: "TON",
             icon: nil,
-            signingProtocol: .init(algorithm: .curve25519, hashingFunction: nil),
+            signingProtocol: .init(
+                algorithm: .curve25519,
+                hashingFunction: nil,
+                messageSigningPrefix: nil
+            ),
             addressFormatting: nil,
             b32: .init(),
             b39: .init(words: .w24, algorithm: .ton()),
@@ -91,7 +95,15 @@ public extension ChainInformation {
         self.init(
             name: "Ethereum",
             icon: nil,
-            signingProtocol: .init(algorithm: .secp256k1, hashingFunction: .keccak256),
+            signingProtocol: .init(
+                algorithm: .secp256k1,
+                hashingFunction: .keccak256,
+                messageSigningPrefix: .init(
+                    firstByte: 25,
+                    prefixText: "Ethereum Signed Message:\n",
+                    hashingFunction: .keccak256
+                )
+            ),
             addressFormatting: .ethereum,
             b32: .init(),
             b39: .init(words: .w12, algorithm: .ethereum()),
@@ -103,7 +115,15 @@ public extension ChainInformation {
         self.init(
             name: "TRON",
             icon: nil,
-            signingProtocol: .init(algorithm: .secp256k1, hashingFunction: .keccak256),
+            signingProtocol: .init(
+                algorithm: .secp256k1,
+                hashingFunction: .keccak256,
+                messageSigningPrefix: .init(
+                    firstByte: 25,
+                    prefixText: "TRON Signed Message:\n",
+                    hashingFunction: .keccak256
+                )
+            ),
             addressFormatting: .tron,
             b32: .init(),
             b39: .init(words: .w12, algorithm: .ethereum()),

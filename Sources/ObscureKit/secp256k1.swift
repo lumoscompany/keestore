@@ -166,7 +166,7 @@ public extension secp256k1 {
 
         _output.update(from: output, count: 64)
         let data = Data(bytes: _output, count: 64)
-        
+
         return Signature(r: data[0 ..< 32], s: data[32 ..< 64], recovery: UInt8(recID))
     }
 }

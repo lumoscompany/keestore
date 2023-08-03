@@ -11,15 +11,21 @@ public extension ChainInformation {
     struct SigningProtocol {
         // MARK: Lifecycle
 
-        public init(algorithm: Algorithm, hashingFunction: HashingFunction?) {
+        public init(
+            algorithm: Algorithm,
+            hashingFunction: HashingFunction?,
+            messageSigningPrefix: SigningMessagePrefix?
+        ) {
             self.algorithm = algorithm
             self.hashingFunction = hashingFunction
+            self.messageSigningPrefix = messageSigningPrefix
         }
 
         // MARK: Public
 
         public let algorithm: Algorithm
         public let hashingFunction: HashingFunction?
+        public let messageSigningPrefix: SigningMessagePrefix?
     }
 }
 
@@ -76,16 +82,54 @@ extension ChainInformation.HashingFunction: Sendable {}
 
 extension ChainInformation.HashingFunction: Hashable {}
 
+// MARK: - ChainInformation.SigningMessagePrefix
+
+public extension ChainInformation {
+    struct SigningMessagePrefix {
+        // MARK: Lifecycle
+
+        public init(firstByte: UInt8?, prefixText: String, hashingFunction: HashingFunction?) {
+            self.firstByte = firstByte
+            self.prefixText = prefixText
+            self.hashingFunction = hashingFunction
+        }
+
+        // MARK: Public
+
+        public let firstByte: UInt8?
+        public let prefixText: String
+        public let hashingFunction: HashingFunction?
+    }
+}
+
+// MARK: - ChainInformation.SigningMessagePrefix + Codable
+
+extension ChainInformation.SigningMessagePrefix: Codable {}
+
+// MARK: - ChainInformation.SigningMessagePrefix + Sendable
+
+extension ChainInformation.SigningMessagePrefix: Sendable {}
+
+// MARK: - ChainInformation.SigningMessagePrefix + Hashable
+
+extension ChainInformation.SigningMessagePrefix: Hashable {}
+
 internal extension Optional where Wrapped == ChainInformation.HashingFunction {
-    func process(_ bytes: any ContiguousBytes) -> some ContiguousBytes {
+    func process(_ bytes: any ContiguousBytes) -> any ContiguousBytes {
         switch self {
         case .none:
             return bytes.concreteBytes
         case let .some(wrapped):
-            switch wrapped {
-            case .keccak256:
-                return keccak256(bytes).concreteBytes
-            }
+            return wrapped.process(bytes)
+        }
+    }
+}
+
+internal extension ChainInformation.HashingFunction {
+    func process(_ bytes: any ContiguousBytes) -> any ContiguousBytes {
+        switch self {
+        case .keccak256:
+            return ObscureKit.keccak256(bytes).concreteBytes
         }
     }
 }
