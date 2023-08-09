@@ -30,7 +30,7 @@ extension BIP39.DerivationAlgorithm: Hashable {}
 // MARK: - BIP39.DerivationAlgorithm.HashingFunction
 
 public extension BIP39.DerivationAlgorithm {
-    enum HashingFunction {
+    enum HashingFunction: String {
         case sha512
     }
 }
