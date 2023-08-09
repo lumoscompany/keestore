@@ -65,12 +65,10 @@ public extension Account.Blockchain {
 public extension Account.Blockchain {
     static func generate(
         for chainInformation: ChainInformation,
-        addressProvider: AddressProvider? = nil,
         using key: DerivedKey
     ) throws -> Account.Blockchain {
         return try .create(
             for: chainInformation,
-            addressProvider: addressProvider,
             with: .generate(for: chainInformation),
             using: key
         )
@@ -78,12 +76,11 @@ public extension Account.Blockchain {
 
     static func create(
         for chainInformation: ChainInformation,
-        addressProvider: AddressProvider? = nil,
         with credentials: Credentials,
         using key: DerivedKey
     ) throws -> Account.Blockchain {
         return try Account.Blockchain(
-            address: chainInformation.address(with: credentials, using: addressProvider),
+            address: chainInformation.address(with: credentials),
             chain: chainInformation,
             credentials: EncryptedValue(decryptedValue: credentials, using: key)
         )
@@ -96,16 +93,12 @@ public extension ChainInformation {
         using addressProvider: Account.Blockchain.AddressProvider? = nil
     ) throws -> Account.Blockchain.Address {
         let privateKey = try credentials.privateKey(for: self)
-
-        let address: Account.Blockchain.Address
-        if let addressProvider {
-            address = try addressProvider.generator(privateKey.publicKey.rawValue)
-        } else if let addressFormatting = addressFormatting {
-            address = try addressFormatting.provider.generator(privateKey.publicKey.rawValue)
-        } else {
+        guard let addressFormatting,
+              let addressProvider = addressFormatting.addressProvider
+        else {
             throw Keestore.Error.unknownAddressFormat
         }
 
-        return address
+        return try addressProvider.generator(privateKey.publicKey.rawValue)
     }
 }

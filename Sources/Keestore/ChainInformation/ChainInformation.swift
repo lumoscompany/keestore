@@ -84,7 +84,7 @@ public extension ChainInformation {
                 hashingFunction: nil,
                 messageSigningPrefix: nil
             ),
-            addressFormatting: nil,
+            addressFormatting: .custom("ton"),
             b32: .init(),
             b39: .init(words: .w24, algorithm: .ton()),
             b44: nil

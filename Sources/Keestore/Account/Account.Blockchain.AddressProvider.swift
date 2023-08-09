@@ -29,30 +29,19 @@ public extension Account.Blockchain {
 }
 
 public extension Account.Blockchain.AddressProvider {
-    static var empty: Account.Blockchain.AddressProvider {
-        Account.Blockchain.AddressProvider(generator: { _ in "" }, validator: { _ in true })
-    }
-}
-
-public extension ChainInformation.AddressFormatting {
-    var provider: Account.Blockchain.AddressProvider {
-        switch self {
-        case .ethereum:
-            return Account.Blockchain.AddressProvider(
-                generator: { publicKey in
-                    Address.Ethereum(publicKey: publicKey).description
-                }, validator: { rawValue in
-                    Address.Ethereum(rawValue) != nil
-                }
-            )
-        case .tron:
-            return Account.Blockchain.AddressProvider(
-                generator: { publicKey in
-                    Address.TRON(publicKey: publicKey).description
-                }, validator: { rawValue in
-                    Address.TRON(rawValue) != nil
-                }
-            )
+    static let ethereum = Account.Blockchain.AddressProvider(
+        generator: { publicKey in
+            Address.Ethereum(publicKey: publicKey).description
+        }, validator: { rawValue in
+            Address.Ethereum(rawValue) != nil
         }
-    }
+    )
+
+    static let tron = Account.Blockchain.AddressProvider(
+        generator: { publicKey in
+            Address.TRON(publicKey: publicKey).description
+        }, validator: { rawValue in
+            Address.TRON(rawValue) != nil
+        }
+    )
 }

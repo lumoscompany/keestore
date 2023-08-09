@@ -13,10 +13,13 @@ final class SigningTests: XCTestCase {
     func testTONSigning() throws {
         let key = DerivedKey(string: "123456")
 
+        ChainInformation.AddressFormatting.custom("ton").register(
+            .init(generator: { _ in "" }, validator: { _ in true })
+        )
+
         try vectors0.forEach({
             let account = try Account.Blockchain.create(
                 for: .ton(),
-                addressProvider: .empty,
                 with: .mnemonica(
                     $0.mnemonica.components(separatedBy: " "),
                     nil
