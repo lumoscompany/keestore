@@ -14,7 +14,7 @@ public extension Account {
 
         public init(
             address: Address,
-            publicKey: PublicKey,
+            publicKey: PublicKey?,
             chain: ChainInformation,
             credentials: EncryptedValue<Credentials>?
         ) {
@@ -30,7 +30,7 @@ public extension Account {
         public typealias Address = String
 
         public var address: Address
-        public var publicKey: PublicKey
+        public var publicKey: PublicKey?
         public var chain: ChainInformation
         public var credentials: EncryptedValue<Credentials>?
     }
