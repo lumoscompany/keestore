@@ -14,10 +14,12 @@ public extension Account {
 
         public init(
             address: Address,
+            publicKey: PublicKey,
             chain: ChainInformation,
             credentials: EncryptedValue<Credentials>?
         ) {
             self.address = address
+            self.publicKey = publicKey
             self.chain = chain
             self.credentials = credentials
         }
@@ -28,6 +30,7 @@ public extension Account {
         public typealias Address = String
 
         public var address: Address
+        public var publicKey: PublicKey
         public var chain: ChainInformation
         public var credentials: EncryptedValue<Credentials>?
     }
@@ -79,8 +82,10 @@ public extension Account.Blockchain {
         with credentials: Credentials,
         using key: DerivedKey
     ) throws -> Account.Blockchain {
+        let publicKey = try credentials.privateKey(for: chainInformation).publicKey
         return try Account.Blockchain(
             address: chainInformation.address(with: credentials),
+            publicKey: publicKey.rawValue,
             chain: chainInformation,
             credentials: EncryptedValue(decryptedValue: credentials, using: key)
         )

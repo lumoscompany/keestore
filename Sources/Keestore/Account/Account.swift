@@ -40,6 +40,7 @@ internal extension Account {
                 name: name,
                 kind: .blockchain(.init(
                     address: blockchain.address,
+                    publicKey: blockchain.publicKey,
                     chain: blockchain.chain,
                     credentials: .init(decryptedValue: _credentials, using: nkey)
                 )),
