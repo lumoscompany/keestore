@@ -10,18 +10,18 @@ import XCTest
 // MARK: - SigningTests
 
 final class SigningTests: XCTestCase {
-    func testTONSigning() throws {
+    func testTONSigning() async throws {
         let key = DerivedKey(string: "123456")
 
         ChainInformation.AddressFormatting.custom("ton").register(
             .init(generator: { _ in "" }, validator: { _ in true })
         )
 
-        try vectors0.forEach({
-            let account = try Account.Blockchain.create(
+        for vector in vectors0 {
+            let account = try await Account.Blockchain.create(
                 for: .ton(),
                 with: .mnemonica(
-                    $0.mnemonica.components(separatedBy: " "),
+                    vector.mnemonica.components(separatedBy: " "),
                     nil
                 ),
                 using: key
@@ -33,7 +33,7 @@ final class SigningTests: XCTestCase {
                 return
             }
 
-            try $0.signs.forEach({
+            try vector.signs.forEach({
                 let data = Data(hexRepresentation: $0.key)
                 let signature = Data(hexRepresentation: $0.value)
                 try XCTAssertEqual(
@@ -41,17 +41,17 @@ final class SigningTests: XCTestCase {
                     true
                 )
             })
-        })
+        }
     }
 
-    func testStandartSigning() throws {
+    func testStandartSigning() async throws {
         let key = DerivedKey(string: "123456")
 
-        try vectors1.forEach({
-            let account = try Account.Blockchain.create(
+        for vector in vectors1 {
+            let account = try await Account.Blockchain.create(
                 for: .ethereum(),
                 with: .mnemonica(
-                    $0.mnemonica.components(separatedBy: " "),
+                    vector.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .ethereum).derivationPath
                 ),
                 using: key
@@ -63,7 +63,7 @@ final class SigningTests: XCTestCase {
                 return
             }
 
-            try $0.signs.forEach({
+            try vector.signs.forEach({
                 let data = Data(hexRepresentation: $0.key)
                 let signature = try signer.sign(data: data)
                 XCTAssertEqual(
@@ -72,7 +72,7 @@ final class SigningTests: XCTestCase {
                 )
             })
 
-            try $0.messages.forEach({
+            try vector.messages.forEach({
                 let message = $0.key
                 let signature = try signer.sign(message: message)
                 XCTAssertEqual(
@@ -80,7 +80,7 @@ final class SigningTests: XCTestCase {
                     [UInt8](hexRepresentation: $0.value)
                 )
             })
-        })
+        }
     }
 }
 

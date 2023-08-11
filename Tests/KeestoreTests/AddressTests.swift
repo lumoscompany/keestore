@@ -10,48 +10,48 @@ import XCTest
 // MARK: - AddressTests
 
 final class AddressTests: XCTestCase {
-    func testEtherieumAddress() throws {
+    func testEtherieumAddress() async throws {
         let key = DerivedKey(string: "123456")
 
-        try vectors0.forEach({
-            let account = try Account.Blockchain.create(
+        for vector in vectors0 {
+            let account = try await Account.Blockchain.create(
                 for: .ethereum(),
                 with: .mnemonica(
-                    $0.mnemonica.components(separatedBy: " "),
+                    vector.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .ethereum).derivationPath
                 ),
                 using: key
             )
 
-            XCTAssertEqual(account.address.lowercased(), $0.address.lowercased())
-        })
-
-        vectors1.forEach({
-            guard let address = Address.Ethereum($0.address)
+            XCTAssertEqual(account.address.lowercased(), vector.address.lowercased())
+        }
+        
+        for vector in vectors1 {
+            guard let address = Address.Ethereum(vector.address)
             else {
                 fatalError()
             }
 
-            XCTAssertEqual(address.toChecksumAddress(), $0.checksumAddress)
-            XCTAssertEqual(Address.Ethereum.isChecksumAddress($0.checksumAddress), true)
-        })
+            XCTAssertEqual(address.toChecksumAddress(), vector.checksumAddress)
+            XCTAssertEqual(Address.Ethereum.isChecksumAddress(vector.checksumAddress), true)
+        }
     }
 
-    func testTRONAddress() throws {
+    func testTRONAddress() async throws {
         let key = DerivedKey(string: "123456")
-
-        try vectors3.forEach({
-            let account = try Account.Blockchain.create(
+        
+        for vector in vectors3 {
+            let account = try await Account.Blockchain.create(
                 for: .tron(),
                 with: .mnemonica(
-                    $0.mnemonica.components(separatedBy: " "),
+                    vector.mnemonica.components(separatedBy: " "),
                     HDWallet(coin: .tron).derivationPath
                 ),
                 using: key
             )
 
-            XCTAssertEqual(account.address.lowercased(), $0.address.lowercased())
-        })
+            XCTAssertEqual(account.address.lowercased(), vector.address.lowercased())
+        }
     }
 }
 

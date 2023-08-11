@@ -20,8 +20,8 @@ public extension Account.Blockchain {
 
         // MARK: Public
 
-        public typealias GeneratorFunction = (Account.Blockchain.PublicKey) throws -> String
-        public typealias ValidatorFunction = (String) -> Bool
+        public typealias GeneratorFunction = (Account.Blockchain.PublicKey) async throws -> String
+        public typealias ValidatorFunction = (String) async -> Bool
 
         public let generator: GeneratorFunction
         public let validator: ValidatorFunction
