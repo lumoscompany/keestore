@@ -14,7 +14,7 @@ final class SigningTests: XCTestCase {
         let key = DerivedKey(string: "123456")
 
         ChainInformation.AddressFormatting.custom("ton").register(
-            .init(generator: { _ in "" }, validator: { _ in true })
+            .init(generator: { _ in "" }, validator: { _, _ in true })
         )
 
         for vector in vectors0 {
