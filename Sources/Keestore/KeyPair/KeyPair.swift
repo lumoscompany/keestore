@@ -24,7 +24,7 @@ internal protocol _DataRepresentable {
 // MARK: - _PublicKey
 
 internal protocol _PublicKey: _DataRepresentable {
-    var uncompressed: Self { get }
+    var compressed: Self { get }
 
     func check(signature: any DataProtocol, for data: any DataProtocol) throws -> Bool
 }

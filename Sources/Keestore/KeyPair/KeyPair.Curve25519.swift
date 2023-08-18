@@ -47,7 +47,7 @@ public extension KeyPair.Curve25519 {
 }
 
 public extension KeyPair.Curve25519.PublicKey {
-    var uncompressed: KeyPair.Curve25519.PublicKey {
+    var compressed: KeyPair.Curve25519.PublicKey {
         self
     }
 

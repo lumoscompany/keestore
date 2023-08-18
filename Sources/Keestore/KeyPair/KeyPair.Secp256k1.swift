@@ -47,10 +47,10 @@ public extension KeyPair.Secp256k1 {
 }
 
 public extension KeyPair.Secp256k1.PublicKey {
-    var uncompressed: KeyPair.Secp256k1.PublicKey {
+    var compressed: KeyPair.Secp256k1.PublicKey {
         let concreteBytes = try? ObscureKit.secp256k1.parsePublicKey(
             from: rawValue,
-            compressed: false
+            compressed: true
         ).concreteBytes
 
         guard let concreteBytes
@@ -100,7 +100,7 @@ public extension KeyPair.Secp256k1.PrivateKey {
         do {
             let publicKey = try ObscureKit.secp256k1.generatePublicKey(
                 from: rawValue,
-                compressed: true
+                compressed: false
             ).concreteBytes
             return KeyPair.Secp256k1.PublicKey(rawValue: Data(publicKey))
         } catch {
