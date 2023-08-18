@@ -99,7 +99,7 @@ public extension ChainInformation {
     ) async throws -> Account.Blockchain.Address {
         let privateKey = try credentials.privateKey(for: self)
         guard let addressFormatting,
-              let addressProvider = addressFormatting.addressProvider
+              let addressProvider = await addressFormatting.addressProvider
         else {
             throw Keestore.Error.unknownAddressFormat
         }

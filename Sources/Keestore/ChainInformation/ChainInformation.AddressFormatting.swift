@@ -63,16 +63,36 @@ extension ChainInformation.AddressFormatting: Sendable {}
 
 extension ChainInformation.AddressFormatting: Hashable {}
 
-public extension ChainInformation.AddressFormatting {
-    internal static var _storage: [
-        ChainInformation.AddressFormatting: Account.Blockchain.AddressProvider
-    ] = [.ethereum: .ethereum, .tron: .tron]
+// MARK: - AddressFormattingStorage
 
-    var addressProvider: Account.Blockchain.AddressProvider? {
-        Self._storage[self]
+private actor AddressFormattingStorage {
+    // MARK: Internal
+
+    func get(_ key: ChainInformation.AddressFormatting) -> Account.Blockchain.AddressProvider? {
+        storage[key]
     }
 
-    func register(_ addressProvider: Account.Blockchain.AddressProvider) {
-        Self._storage[self] = addressProvider
+    func set(_ key: ChainInformation.AddressFormatting, value: Account.Blockchain.AddressProvider) {
+        storage[key] = value
+    }
+
+    // MARK: Private
+
+    private var storage: [
+        ChainInformation.AddressFormatting: Account.Blockchain.AddressProvider
+    ] = [.ethereum: .ethereum, .tron: .tron]
+}
+
+public extension ChainInformation.AddressFormatting {
+    private static var _storage = AddressFormattingStorage()
+
+    var addressProvider: Account.Blockchain.AddressProvider? {
+        get async {
+            await Self._storage.get(self)
+        }
+    }
+
+    func register(_ addressProvider: Account.Blockchain.AddressProvider) async {
+        await Self._storage.set(self, value: addressProvider)
     }
 }

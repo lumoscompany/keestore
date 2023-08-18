@@ -13,7 +13,7 @@ final class SigningTests: XCTestCase {
     func testTONSigning() async throws {
         let key = DerivedKey(string: "123456")
 
-        ChainInformation.AddressFormatting.custom("ton").register(
+        await ChainInformation.AddressFormatting.custom("ton").register(
             .init(generator: { _ in "" }, validator: { _, _ in true })
         )
 
