@@ -170,9 +170,9 @@ private extension UIColor {
     func resolvedColor(using appearance: PlatformAppearance) -> UIColor {
         switch appearance {
         case .default:
-            return resolvedColor(with: .init(userInterfaceStyle: .dark))
-        case .dark:
             return resolvedColor(with: .init(userInterfaceStyle: .light))
+        case .dark:
+            return resolvedColor(with: .init(userInterfaceStyle: .dark))
         }
     }
 }
@@ -194,9 +194,9 @@ private extension NSColor {
         let _appearance: NSAppearance?
         switch appearance {
         case .default:
-            _appearance = NSAppearance(named: .darkAqua)
-        case .dark:
             _appearance = NSAppearance(named: .aqua)
+        case .dark:
+            _appearance = NSAppearance(named: .darkAqua)
         }
 
         var color = self
