@@ -102,11 +102,13 @@ public extension Account.ViewRepresentation {
         public init(
             backgroundAsset: CodableResource,
             primaryForegroundColor: PlatformColor,
-            secondaryForegroundColor: PlatformColor
+            secondaryForegroundColor: PlatformColor,
+            borderColor: PlatformColor
         ) {
             self.backgroundAsset = backgroundAsset
             self.primaryForegroundColor = primaryForegroundColor
             self.secondaryForegroundColor = secondaryForegroundColor
+            self.borderColor = borderColor
         }
 
         // MARK: Public
@@ -115,6 +117,8 @@ public extension Account.ViewRepresentation {
 
         public var primaryForegroundColor: PlatformColor
         public var secondaryForegroundColor: PlatformColor
+
+        public var borderColor: PlatformColor
     }
 }
 
