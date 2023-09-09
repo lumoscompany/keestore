@@ -124,7 +124,30 @@ public extension Account.ViewRepresentation {
 
 // MARK: - Account.ViewRepresentation.ISO7810 + Codable
 
-extension Account.ViewRepresentation.ISO7810: Codable {}
+extension Account.ViewRepresentation.ISO7810: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self.backgroundAsset = try container.decode(
+            CodableResource.self,
+            forKey: .backgroundAsset
+        )
+
+        self.primaryForegroundColor = try container.decode(
+            PlatformColor.self,
+            forKey: .primaryForegroundColor
+        )
+        self.secondaryForegroundColor = try container.decode(
+            PlatformColor.self,
+            forKey: .secondaryForegroundColor
+        )
+
+        self.borderColor = try container.decodeIfPresent(
+            PlatformColor.self,
+            forKey: .borderColor
+        ) ?? .init(rawValue: .clear)
+    }
+}
 
 // MARK: - Account.ViewRepresentation.ISO7810 + Sendable
 
