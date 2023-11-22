@@ -72,6 +72,11 @@ public extension KeyPair.Curve25519 {
     struct PrivateKey: _PrivateKey {
         // MARK: Lifecycle
 
+        public init() {
+            let privateKey = Curve25519.Signing.PrivateKey()
+            self.rawValue = privateKey.rawRepresentation
+        }
+
         public init(rawValue: Data) throws {
             guard rawValue.count == 32
             else {
