@@ -9,6 +9,7 @@ import Foundation
 public extension Account {
     enum Kind {
         case blockchain(Blockchain)
+        case elementkey(Elementkey)
         case generic(Generic)
     }
 }

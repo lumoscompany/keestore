@@ -46,6 +46,23 @@ internal extension Account {
                 )),
                 view: view
             )
+        case let .elementkey(elementkey):
+            let privateKey = try elementkey.credentials.privateKey.decrypt(using: key)
+            return try .init(
+                uuid: uuid,
+                name: name,
+                kind: .elementkey(.init(
+                    item: elementkey.item,
+                    service: elementkey.service,
+                    token: elementkey.token,
+                    credentials: .init(
+                        publicKey: elementkey.credentials.publicKey,
+                        signatureProtocol: elementkey.credentials.signatureProtocol,
+                        privateKey: .init(decryptedValue: privateKey, using: nkey)
+                    )
+                )),
+                view: view
+            )
         case let .generic(generic):
             let _credentials = try generic.credentials.decrypt(using: key)
             return try .init(
