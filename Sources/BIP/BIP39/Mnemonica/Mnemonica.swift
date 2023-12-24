@@ -11,10 +11,6 @@ public extension BIP39 {
     struct Mnemonica {
         // MARK: Lifecycle
 
-        init<D>(_ entropy: D, glossary: Glossary) throws where D: ContiguousBytes {
-            self = try BIP39.Mnemonica.generate(from: entropy, glossary: glossary)
-        }
-
         private init(words: [String], length: Length, glossary: Glossary) {
             self.words = words
             self.length = length
@@ -32,6 +28,10 @@ public extension BIP39 {
 // MARK: - BIP39.Mnemonica + RawRepresentable
 
 extension BIP39.Mnemonica: RawRepresentable {
+    public init(_ entropy: BIP39.Entropy, glossary: Glossary) throws {
+        self = try BIP39.Mnemonica.generate(from: entropy, glossary: glossary)
+    }
+
     public init?(rawValue: String) {
         self.init(rawValue: rawValue.components(separatedBy: " "))
     }
@@ -79,14 +79,10 @@ extension BIP39.Mnemonica: Sendable {}
 
 internal extension BIP39.Mnemonica {
     static func generate(
-        from entropy: ContiguousBytes,
+        from entropy: BIP39.Entropy,
         glossary: BIP39.Mnemonica.Glossary
     ) throws -> BIP39.Mnemonica {
-        var entropyBytes = [UInt8]()
-        let _ = entropy.withUnsafeBytes({ buffer in
-            entropyBytes.append(contentsOf: buffer)
-        })
-
+        let entropyBytes = entropy.bytes.concreteBytes
         let checksumBits = _checksumBits(entropyBytes)
         let entropyBits = String(entropyBytes.flatMap({
             ("00000000" + String($0, radix: 2)).suffix(8)
@@ -103,7 +99,7 @@ internal extension BIP39.Mnemonica {
 
             guard let index = Int(bits[startIndex ..< endIndex], radix: 2)
             else {
-                fatalError("[BIP39]: `_generateRandomWords` error.")
+                throw BIP39.Error.invalidEntropyCount
             }
 
             words.append(vocabulary[index])

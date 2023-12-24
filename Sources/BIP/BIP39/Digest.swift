@@ -29,8 +29,7 @@ public extension BIP39.Digest {
         length: BIP39.Mnemonica.Length,
         algorithm: [BIP39.DerivationAlgorithm]
     ) {
-        let entropy = BIP39.Digest._entropy(with: length)
-        guard let mnemonica = try? BIP39.Mnemonica(entropy, glossary: glossary),
+        guard let mnemonica = try? BIP39.Mnemonica(.init(length: length), glossary: glossary),
               let digest = try? BIP39.Digest(mnemonica, algorithm: algorithm)
         else {
             fatalError("[BIP39]: Random mnemonica generation failed.")
@@ -44,15 +43,6 @@ public extension BIP39.Digest {
             mnemonica: mnemonica,
             seed: algorithm.seed(from: mnemonica.words)
         )
-    }
-}
-
-internal extension BIP39.Digest {
-    static func _entropy(with length: BIP39.Mnemonica.Length) -> ContiguousBytes {
-        let count = length.entropyStrength / 8
-        var entropy = [UInt8](repeating: 0, count: count)
-        _ = SecRandomCopyBytes(kSecRandomDefault, entropy.count, &entropy)
-        return entropy
     }
 }
 
