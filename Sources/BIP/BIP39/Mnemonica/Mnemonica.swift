@@ -56,6 +56,7 @@ public extension BIP39.Mnemonica {
     }
 
     init(_ words: [String]) throws {
+        let words = words.map({ $0.lowercased() })
         let tuple = try BIP39.Mnemonica.check(words)
         self.init(words: words, length: tuple.0, glossary: tuple.1)
     }
