@@ -28,6 +28,24 @@ final class BIP39Tests: XCTestCase {
         })
     }
 
+    func testEntropyMnemonicaConverible() throws {
+        try vectors0.forEach({
+            let mnemonica0 = try Mnemonica($0.mnemonica)
+            let entropy = mnemonica0.entopy
+
+            let mnemonica1 = try Mnemonica(entropy, glossary: mnemonica0.glossary)
+            XCTAssertEqual(mnemonica0.words, mnemonica1.words)
+        })
+        
+        try vectors1.forEach({
+            let mnemonica0 = try Mnemonica($0.mnemonica)
+            let entropy = mnemonica0.entopy
+
+            let mnemonica1 = try Mnemonica(entropy, glossary: mnemonica0.glossary)
+            XCTAssertEqual(mnemonica0.words, mnemonica1.words)
+        })
+    }
+
     func testTON() throws {
         try vectors2.forEach({
             let digest = try Mnemonica($0.mnemonica).digest(with: .ton())
