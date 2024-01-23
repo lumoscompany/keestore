@@ -26,7 +26,7 @@ extension BIP39.Mnemonica.Glossary: Hashable {}
 
 extension BIP39.Mnemonica.Glossary: Sendable {}
 
-internal extension BIP39.Mnemonica.Glossary {
+public extension BIP39.Mnemonica.Glossary {
     var list: [String] {
         switch self {
         case .english:
