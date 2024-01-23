@@ -23,12 +23,20 @@ public extension BIP39 {
         public let length: Length
         public let glossary: Glossary
 
+        public var isValid: Bool { _entropy != nil }
+
         public var entopy: Entropy {
-            guard let entropy = try? BIP39.Mnemonica._entropy(from: words, glossary: glossary)
+            guard let _entropy
             else {
                 fatalError("Couldn't generate entropy")
             }
-            return entropy
+            return _entropy
+        }
+
+        // MARK: Private
+
+        private var _entropy: BIP39.Entropy? {
+            try? BIP39.Mnemonica._entropy(from: words, glossary: glossary)
         }
     }
 }
@@ -158,13 +166,13 @@ private extension BIP39.Mnemonica {
 
         let entropyBits = String(bits.prefix(divider))
         let checksumBits = String(bits.suffix(bits.count - divider))
-        
+
         let entropyBytes = [UInt8](bitsStringRepresentation: entropyBits)
         guard checksumBits == _checksum(entropyBytes)
         else {
             throw BIP39.Error.invalidMnemonicaVocabulary
         }
-        
+
         return .init(entropyBytes)
     }
 
@@ -212,7 +220,7 @@ private extension Array where Element == UInt8 {
             withPad: "0",
             startingAt: 0
         ).map({ $0 })
-        
+
         self = stride(from: 0, to: padded.count, by: 8).map({
             let substring = String(padded[$0 ..< $0 + 8])
             guard let byte = UInt8(substring, radix: 2)
