@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import CryptoKit
@@ -10,6 +10,25 @@ import Foundation
 public extension BIP39 {
     struct Mnemonica {
         // MARK: Lifecycle
+
+        public init(length: Length, glossary: Glossary = .english) {
+            let entropy = Entropy(length: length)
+            try! self.init(entropy: entropy, glossary: glossary, options: .defaults)
+        }
+
+        public init(
+            entropy: BIP39.Entropy,
+            glossary: Glossary = .english,
+            options: CodingOptions = .defaults
+        ) throws {
+            let words = try Self._words(from: entropy, glossary: glossary, options: options)
+            guard let length = BIP39.Mnemonica.Length(rawValue: words.count)
+            else {
+                throw BIP39.Error.invalidMnemonicaLength
+            }
+
+            self.init(words: words, length: length, glossary: glossary)
+        }
 
         private init(words: [String], length: Length, glossary: Glossary) {
             self.words = words
@@ -23,20 +42,10 @@ public extension BIP39 {
         public let length: Length
         public let glossary: Glossary
 
-        public var isValid: Bool { _entropy != nil }
+        public var isValidChecksum: Bool { (try? entropy(.validateChecksum)) != nil }
 
-        public var entopy: Entropy {
-            guard let _entropy
-            else {
-                fatalError("Couldn't generate entropy")
-            }
-            return _entropy
-        }
-
-        // MARK: Private
-
-        private var _entropy: BIP39.Entropy? {
-            try? BIP39.Mnemonica._entropy(from: words, glossary: glossary)
+        public func entropy(_ options: CodingOptions = .defaults) throws -> Entropy {
+            try BIP39.Mnemonica._entropy(from: words, glossary: glossary, options: options)
         }
     }
 }
@@ -44,43 +53,77 @@ public extension BIP39 {
 // MARK: - BIP39.Mnemonica + RawRepresentable
 
 extension BIP39.Mnemonica: RawRepresentable {
-    public init(_ entropy: BIP39.Entropy, glossary: Glossary) throws {
-        self = try BIP39.Mnemonica.generate(from: entropy, glossary: glossary)
-    }
-
-    public init?(rawValue: String) {
-        self.init(rawValue: rawValue.components(separatedBy: " "))
+    public init(_ rawValue: [String]) throws {
+        guard let value = BIP39.Mnemonica(rawValue: rawValue)
+        else {
+            throw BIP39.Error.invalidMnemonicaVocabulary
+        }
+        self = value
     }
 
     public init?(rawValue: [String]) {
-        guard let tuple = try? BIP39.Mnemonica.check(rawValue)
+        let lowercasedWords = rawValue.map({ $0.lowercased() })
+        guard let tuple = try? BIP39.Mnemonica.check(lowercasedWords)
         else {
             return nil
         }
 
-        self.init(words: rawValue, length: tuple.0, glossary: tuple.1)
+        self.init(words: lowercasedWords, length: tuple.0, glossary: tuple.1)
     }
 
-    public var rawValue: [String] {
-        words
+    public var rawValue: [String] { words }
+}
+
+// MARK: - BIP39.Mnemonica + ExpressibleByStringLiteral
+
+extension BIP39.Mnemonica: ExpressibleByStringLiteral {
+    public init(stringLiteral value: StringLiteralType) {
+        guard let value = BIP39.Mnemonica(value)
+        else {
+            fatalError("Couldn't initialize `Mnemonica` from string literal \(value)")
+        }
+        self = value
     }
 }
 
-public extension BIP39.Mnemonica {
-    init(_ words: String) throws {
-        try self.init(words.components(separatedBy: " "))
+// MARK: - BIP39.Mnemonica + LosslessStringConvertible
+
+extension BIP39.Mnemonica: LosslessStringConvertible {
+    public init(description: String) throws {
+        try self.init(description.components(separatedBy: " "))
     }
 
-    init(_ words: [String]) throws {
-        let words = words.map({ $0.lowercased() })
-        let tuple = try BIP39.Mnemonica.check(words)
-        self.init(words: words, length: tuple.0, glossary: tuple.1)
+    public init?(_ description: String) {
+        self.init(rawValue: description.components(separatedBy: " "))
+    }
+
+    public var description: String {
+        rawValue.joined(separator: " ")
     }
 }
 
 public extension BIP39.Mnemonica {
     func digest(with algorithm: [BIP39.DerivationAlgorithm]) throws -> BIP39.Digest {
-        try BIP39.Digest(self, algorithm: algorithm)
+        try BIP39.Digest(mnemonica: self, algorithm: algorithm)
+    }
+}
+
+// MARK: - BIP39.Mnemonica.CodingOptions
+
+public extension BIP39.Mnemonica {
+    struct CodingOptions: OptionSet {
+        // MARK: Lifecycle
+
+        public init(rawValue: UInt) {
+            self.rawValue = rawValue
+        }
+
+        // MARK: Public
+
+        public static let validateChecksum = CodingOptions(rawValue: 1 << 0)
+        public static let defaults: CodingOptions = [.validateChecksum]
+
+        public var rawValue: UInt
     }
 }
 
@@ -94,29 +137,11 @@ extension BIP39.Mnemonica: Hashable {}
 
 extension BIP39.Mnemonica: Sendable {}
 
-internal extension BIP39.Mnemonica {
-    static func generate(
-        from entropy: BIP39.Entropy,
-        glossary: BIP39.Mnemonica.Glossary
-    ) throws -> BIP39.Mnemonica {
-        let words = try _words(from: entropy, glossary: glossary)
-        guard let length = BIP39.Mnemonica.Length(rawValue: words.count)
-        else {
-            throw BIP39.Error.invalidMnemonicaLength
-        }
-
-        return BIP39.Mnemonica(
-            words: words,
-            length: length,
-            glossary: glossary
-        )
-    }
-}
-
 private extension BIP39.Mnemonica {
     static func _words(
         from entropy: BIP39.Entropy,
-        glossary: BIP39.Mnemonica.Glossary
+        glossary: BIP39.Mnemonica.Glossary,
+        options: CodingOptions
     ) throws -> [String] {
         let entropyBytes = entropy.bytes.concreteBytes
         let checksumBits = _checksum(entropyBytes)
@@ -146,7 +171,8 @@ private extension BIP39.Mnemonica {
 
     static func _entropy(
         from words: [String],
-        glossary: BIP39.Mnemonica.Glossary
+        glossary: BIP39.Mnemonica.Glossary,
+        options: CodingOptions
     ) throws -> BIP39.Entropy {
         let bits = try words.map({
             guard let index = glossary.list.firstIndex(of: $0)
@@ -168,8 +194,7 @@ private extension BIP39.Mnemonica {
         let checksumBits = String(bits.suffix(bits.count - divider))
 
         let entropyBytes = [UInt8](bitsStringRepresentation: entropyBits)
-        guard checksumBits == _checksum(entropyBytes)
-        else {
+        if options.contains(.validateChecksum) && checksumBits != _checksum(entropyBytes) {
             throw BIP39.Error.invalidMnemonicaVocabulary
         }
 

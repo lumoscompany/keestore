@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import Foundation
@@ -9,8 +9,7 @@ public extension BIP39 {
         // MARK: Lifecycle
 
         public init(length: Mnemonica.Length) {
-            let count = length.entropyStrength / 8
-            self.init(count: count)
+            self.init(count: length.entropyBytesCount)
         }
 
         public init(count: Int) {
@@ -28,14 +27,5 @@ public extension BIP39 {
 
         public let count: Int
         public let bytes: any ContiguousBytes
-
-        // MARK: Internal
-
-        static func _entropy(with length: BIP39.Mnemonica.Length) -> ContiguousBytes {
-            let count = length.entropyStrength / 8
-            var entropy = [UInt8](repeating: 0, count: count)
-            _ = SecRandomCopyBytes(kSecRandomDefault, entropy.count, &entropy)
-            return entropy
-        }
     }
 }

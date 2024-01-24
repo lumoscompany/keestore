@@ -1,14 +1,24 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import Foundation
 
 // MARK: - BIP39.Mnemonica.Glossary
 
+/// - note: https://github.com/bitcoin/bips/blob/master/bip-0039/bip-0039-wordlists.md
 public extension BIP39.Mnemonica {
     enum Glossary {
         case english
+        case japanese
+        case korean
+        case spanish
+        case chineseSimplified
+        case chineseTraditional
+        case french
+        case italian
+        case czech
+        case portuguese
     }
 }
 
@@ -29,14 +39,13 @@ extension BIP39.Mnemonica.Glossary: Sendable {}
 public extension BIP39.Mnemonica.Glossary {
     var list: [String] {
         switch self {
-        case .english:
-            return __EnglishGlossary
+        case .english: __EnglishGlossary
+        default: []
         }
     }
 
     func validate(_ words: [String]) -> Bool {
-        let list = list
-        return words.filter({ list.contains($0) }).count == words.count
+        words.filter({ list.contains($0) }).count == words.count
     }
 }
 

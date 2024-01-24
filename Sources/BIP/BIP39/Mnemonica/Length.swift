@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import Foundation
@@ -11,6 +11,16 @@ public extension BIP39.Mnemonica {
         case w12
         case w18
         case w24
+
+        // MARK: Internal
+
+        internal var entropyBitsCount: Int {
+            switch self {
+            case .w12: 128
+            case .w18: 192
+            case .w24: 256
+            }
+        }
     }
 }
 
@@ -19,14 +29,10 @@ public extension BIP39.Mnemonica {
 extension BIP39.Mnemonica.Length: RawRepresentable {
     public init?(rawValue: Int) {
         switch rawValue {
-        case 12:
-            self = .w12
-        case 18:
-            self = .w18
-        case 24:
-            self = .w24
-        default:
-            return nil
+        case Self.w12.rawValue: self = .w12
+        case Self.w18.rawValue: self = .w18
+        case Self.w24.rawValue: self = .w24
+        default: return nil
         }
     }
 
@@ -34,26 +40,35 @@ extension BIP39.Mnemonica.Length: RawRepresentable {
 
     public var rawValue: Int {
         switch self {
-        case .w12:
-            return 12
-        case .w18:
-            return 18
-        case .w24:
-            return 24
+        case .w12: 12
+        case .w18: 18
+        case .w24: 24
         }
     }
 }
 
-internal extension BIP39.Mnemonica.Length {
-    var entropyStrength: Int {
-        switch self {
-        case .w12:
-            return 128
-        case .w18:
-            return 192
-        case .w24:
-            return 256
+public extension BIP39.Mnemonica.Length {
+    init?(entropyBytesCount: Int) {
+        switch entropyBytesCount {
+        case Self.w12.entropyBytesCount: self = .w12
+        case Self.w18.entropyBytesCount: self = .w18
+        case Self.w24.entropyBytesCount: self = .w24
+        default: return nil
         }
+    }
+
+    var entropyBytesCount: Int {
+        entropyBitsCount / 8
+    }
+}
+
+public extension BIP39.Mnemonica.Length {
+    init?(wordsCount: Int) {
+        self.init(rawValue: wordsCount)
+    }
+
+    var wordsCount: Int {
+        rawValue
     }
 }
 

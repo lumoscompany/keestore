@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import CryptoKit
@@ -25,24 +25,21 @@ public extension BIP39 {
 
 public extension BIP39.Digest {
     init(
-        glossary: BIP39.Mnemonica.Glossary = .english,
         length: BIP39.Mnemonica.Length,
+        glossary: BIP39.Mnemonica.Glossary = .english,
         algorithm: [BIP39.DerivationAlgorithm]
     ) {
-        guard let mnemonica = try? BIP39.Mnemonica(.init(length: length), glossary: glossary),
-              let digest = try? BIP39.Digest(mnemonica, algorithm: algorithm)
+        let mnemonica = BIP39.Mnemonica(length: length, glossary: glossary)
+        guard let digest = try? BIP39.Digest(mnemonica: mnemonica, algorithm: algorithm)
         else {
-            fatalError("[BIP39]: Random mnemonica generation failed.")
+            fatalError("[BIP39]: Random mnemonica's digest generation failed.")
         }
 
         self = digest
     }
 
-    init(_ mnemonica: BIP39.Mnemonica, algorithm: [BIP39.DerivationAlgorithm]) throws {
-        try self.init(
-            mnemonica: mnemonica,
-            seed: algorithm.seed(from: mnemonica.words)
-        )
+    init(mnemonica: BIP39.Mnemonica, algorithm: [BIP39.DerivationAlgorithm]) throws {
+        try self.init(mnemonica: mnemonica, seed: algorithm.seed(from: mnemonica.words))
     }
 }
 

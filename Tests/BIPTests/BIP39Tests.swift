@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import Foundation
@@ -13,7 +13,7 @@ import XCTest
 final class BIP39Tests: XCTestCase {
     func testStandart() throws {
         try vectors0.forEach({
-            let digest = try Mnemonica($0.mnemonica).digest(with: .ethereum(
+            let digest = try $0.mnemonica.digest(with: .ethereum(
                 password: $0.password,
                 iterations: $0.iterations,
                 klength: $0.keyLength
@@ -23,39 +23,39 @@ final class BIP39Tests: XCTestCase {
         })
 
         try vectors1.forEach({
-            let digest = try Mnemonica($0.mnemonica).digest(with: .ethereum(password: "TREZOR"))
+            let digest = try $0.mnemonica.digest(with: .ethereum(password: "TREZOR"))
             XCTAssertEqual(digest.seed.hexRepresentation, $0.seed)
         })
     }
 
     func testEntropyMnemonicaConverible() throws {
         try vectors0.forEach({
-            let mnemonica0 = try Mnemonica($0.mnemonica)
-            let entropy = mnemonica0.entopy
+            let mnemonica0 = $0.mnemonica
+            let entropy = try mnemonica0.entropy()
 
-            let mnemonica1 = try Mnemonica(entropy, glossary: mnemonica0.glossary)
+            let mnemonica1 = try Mnemonica(entropy: entropy, glossary: mnemonica0.glossary)
             XCTAssertEqual(mnemonica0.words, mnemonica1.words)
         })
-        
-        try vectors1.forEach({
-            let mnemonica0 = try Mnemonica($0.mnemonica)
-            let entropy = mnemonica0.entopy
 
-            let mnemonica1 = try Mnemonica(entropy, glossary: mnemonica0.glossary)
+        try vectors1.forEach({
+            let mnemonica0 = $0.mnemonica
+            let entropy = try mnemonica0.entropy()
+
+            let mnemonica1 = try Mnemonica(entropy: entropy, glossary: mnemonica0.glossary)
             XCTAssertEqual(mnemonica0.words, mnemonica1.words)
         })
     }
 
     func testTON() throws {
         try vectors2.forEach({
-            let digest = try Mnemonica($0.mnemonica).digest(with: .ton())
+            let digest = try $0.mnemonica.digest(with: .ton())
             XCTAssertEqual(digest.seed.hexRepresentation, $0.seed)
         })
     }
 
     func testCreateImportTON() throws {
         try stride(from: 0, to: 10, by: 1).forEach({ _ in
-            let lhs = BIP39.Digest(glossary: .english, length: .w24, algorithm: .ton())
+            let lhs = BIP39.Digest(length: .w24, glossary: .english, algorithm: .ton())
             let rhs = try Mnemonica(lhs.mnemonica.words).digest(with: .ton())
             XCTAssertEqual(lhs, rhs)
         })
@@ -63,7 +63,7 @@ final class BIP39Tests: XCTestCase {
 
     func testCreateImportStandart() throws {
         try stride(from: 0, to: 10, by: 1).forEach({ _ in
-            let lhs = BIP39.Digest(glossary: .english, length: .w12, algorithm: .ethereum())
+            let lhs = BIP39.Digest(length: .w12, glossary: .english, algorithm: .ethereum())
             let rhs = try Mnemonica(lhs.mnemonica.words).digest(with: .ethereum())
 
             XCTAssertEqual(lhs, rhs)
@@ -72,7 +72,7 @@ final class BIP39Tests: XCTestCase {
 }
 
 private var vectors0: [(
-    mnemonica: String,
+    mnemonica: BIP39.Mnemonica,
     password: String,
     iterations: Int,
     keyLength: Int,
@@ -110,7 +110,7 @@ private var vectors0: [(
 
 private var vectors1: [(
     entropy: String,
-    mnemonica: String,
+    mnemonica: BIP39.Mnemonica,
     seed: String
 )] = [
     (
@@ -235,7 +235,10 @@ private var vectors1: [(
     ),
 ]
 
-private var vectors2: [(mnemonica: String, seed: String)] = [
+private var vectors2: [(
+    mnemonica: BIP39.Mnemonica,
+    seed: String
+)] = [
     (
         "spoon keep labor chalk cover grid before struggle physical cram empower trigger outdoor skill clutch loud venture assume inch put idle crop mask mesh",
         "414f2252026abb2dc5e5f2b6a54038d46ccac62fef466e91a19c16b04e3225dc"

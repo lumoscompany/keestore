@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import Foundation
@@ -20,7 +20,7 @@ public extension Account.Blockchain {
 
 public extension Account.Blockchain.Credentials {
     static func generate(for chain: ChainInformation) -> Account.Blockchain.Credentials {
-        let digest = BIP39.Digest(for: chain)
+        let digest = BIP39.Digest(chainInformation: chain)
         if let coin = chain.b44?.coin {
             let derivationPath = HDWallet(coin: coin).derivationPath
             return .mnemonica(digest.mnemonica.words, derivationPath)
@@ -38,7 +38,7 @@ internal extension Account.Blockchain.Credentials {
             rawValue = secretKey
         case let .mnemonica(phrase, derivationPath):
             let mnemonica = try Mnemonica(phrase)
-            let digest = try BIP39.Digest(for: chain, with: mnemonica)
+            let digest = try BIP39.Digest(mnemonica: mnemonica, chainInformation: chain)
 
             if let derivationPath {
                 rawValue = ExtendedKey(digest, derivationPath).keyPair.privateKey.rawValue

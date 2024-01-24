@@ -1,5 +1,5 @@
 //
-//  Created by Anton Spivak
+//  Created by Adam Stragner
 //
 
 import BIP
@@ -64,13 +64,13 @@ extension ChainInformation: Hashable {
 }
 
 public extension BIP39.Digest {
-    init(for chainInformation: ChainInformation) {
+    init(chainInformation: ChainInformation) {
         let b39 = chainInformation.b39
         self.init(length: b39.words, algorithm: b39.algorithm)
     }
 
-    init(for chainInformation: ChainInformation, with mnemonica: Mnemonica) throws {
-        try self.init(mnemonica, algorithm: chainInformation.b39.algorithm)
+    init(mnemonica: Mnemonica, chainInformation: ChainInformation) throws {
+        try self.init(mnemonica: mnemonica, algorithm: chainInformation.b39.algorithm)
     }
 }
 
