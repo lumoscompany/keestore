@@ -11,6 +11,7 @@ let package = Package(
     ],
     products: [
         .library(name: "Keestore", targets: ["Keestore"]),
+        .library(name: "BIP", targets: ["BIP"]),
     ],
     dependencies: [
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
