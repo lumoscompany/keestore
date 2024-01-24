@@ -13,21 +13,27 @@ public extension BIP39 {
 
         public init(length: Length, glossary: Glossary = .english) {
             let entropy = Entropy(length: length)
-            try! self.init(entropy: entropy, glossary: glossary, options: .defaults)
+            try! self.init(entropy: entropy, glossary: glossary)
         }
 
-        public init(
-            entropy: BIP39.Entropy,
-            glossary: Glossary = .english,
-            options: CodingOptions = .defaults
-        ) throws {
-            let words = try Self._words(from: entropy, glossary: glossary, options: options)
+        public init(entropy: BIP39.Entropy, glossary: Glossary = .english) throws {
+            let words = try Self._words(from: entropy, glossary: glossary, options: .defaults)
             guard let length = BIP39.Mnemonica.Length(rawValue: words.count)
             else {
                 throw BIP39.Error.invalidMnemonicaLength
             }
 
             self.init(words: words, length: length, glossary: glossary)
+        }
+
+        private init(words: [String], options: ParsingOptions) throws {
+            let lowercasedWords = words.map({ $0.lowercased() })
+            guard let tuple = try? BIP39.Mnemonica.check(lowercasedWords)
+            else {
+                throw BIP39.Error.invalidMnemonicaVocabulary
+            }
+
+            self.init(words: words, length: tuple.0, glossary: tuple.1)
         }
 
         private init(words: [String], length: Length, glossary: Glossary) {
@@ -44,7 +50,7 @@ public extension BIP39 {
 
         public var isValidChecksum: Bool { (try? entropy(.validateChecksum)) != nil }
 
-        public func entropy(_ options: CodingOptions = .defaults) throws -> Entropy {
+        public func entropy(_ options: ParsingOptions = .defaults) throws -> Entropy {
             try BIP39.Mnemonica._entropy(from: words, glossary: glossary, options: options)
         }
     }
@@ -53,22 +59,12 @@ public extension BIP39 {
 // MARK: - BIP39.Mnemonica + RawRepresentable
 
 extension BIP39.Mnemonica: RawRepresentable {
-    public init(_ rawValue: [String]) throws {
-        guard let value = BIP39.Mnemonica(rawValue: rawValue)
-        else {
-            throw BIP39.Error.invalidMnemonicaVocabulary
-        }
-        self = value
+    public init(_ rawValue: [String], options: ParsingOptions = .defaults) throws {
+        try self.init(words: rawValue, options: options)
     }
 
     public init?(rawValue: [String]) {
-        let lowercasedWords = rawValue.map({ $0.lowercased() })
-        guard let tuple = try? BIP39.Mnemonica.check(lowercasedWords)
-        else {
-            return nil
-        }
-
-        self.init(words: lowercasedWords, length: tuple.0, glossary: tuple.1)
+        try? self.init(words: rawValue, options: .defaults)
     }
 
     public var rawValue: [String] { words }
@@ -89,12 +85,12 @@ extension BIP39.Mnemonica: ExpressibleByStringLiteral {
 // MARK: - BIP39.Mnemonica + LosslessStringConvertible
 
 extension BIP39.Mnemonica: LosslessStringConvertible {
-    public init(description: String) throws {
-        try self.init(description.components(separatedBy: " "))
+    public init(description: String, options: ParsingOptions = .defaults) throws {
+        try self.init(words: description.components(separatedBy: " "), options: options)
     }
 
     public init?(_ description: String) {
-        self.init(rawValue: description.components(separatedBy: " "))
+        try? self.init(words: description.components(separatedBy: " "), options: .defaults)
     }
 
     public var description: String {
@@ -108,10 +104,10 @@ public extension BIP39.Mnemonica {
     }
 }
 
-// MARK: - BIP39.Mnemonica.CodingOptions
+// MARK: - BIP39.Mnemonica.ParsingOptions
 
 public extension BIP39.Mnemonica {
-    struct CodingOptions: OptionSet {
+    struct ParsingOptions: OptionSet {
         // MARK: Lifecycle
 
         public init(rawValue: UInt) {
@@ -120,8 +116,8 @@ public extension BIP39.Mnemonica {
 
         // MARK: Public
 
-        public static let validateChecksum = CodingOptions(rawValue: 1 << 0)
-        public static let defaults: CodingOptions = [.validateChecksum]
+        public static let validateChecksum = ParsingOptions(rawValue: 1 << 0)
+        public static let defaults: ParsingOptions = [.validateChecksum]
 
         public var rawValue: UInt
     }
@@ -141,7 +137,7 @@ private extension BIP39.Mnemonica {
     static func _words(
         from entropy: BIP39.Entropy,
         glossary: BIP39.Mnemonica.Glossary,
-        options: CodingOptions
+        options: ParsingOptions
     ) throws -> [String] {
         let entropyBytes = entropy.bytes.concreteBytes
         let checksumBits = _checksum(entropyBytes)
@@ -172,7 +168,7 @@ private extension BIP39.Mnemonica {
     static func _entropy(
         from words: [String],
         glossary: BIP39.Mnemonica.Glossary,
-        options: CodingOptions
+        options: ParsingOptions
     ) throws -> BIP39.Entropy {
         let bits = try words.map({
             guard let index = glossary.list.firstIndex(of: $0)
